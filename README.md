@@ -46,9 +46,9 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 - ecs_service
 
 ## Exec into a running container on ECS
-- Command to exec into a container of a known task:
+- Command to exec into a container:
     ```bash
-    ./exec-container.sh myApp-backend-staging task=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    ./exec-container.sh myApp-backend-staging
     ```
 
 #### Required variables
