@@ -8,6 +8,6 @@ do
    VALUE="${ARGUMENT:$KEY_LENGTH+1}"
 
    if [ ! -z $VALUE ]; then
-      export "arg_$KEY"="$VALUE"
+      export "$KEY"="$VALUE"
    fi
 done

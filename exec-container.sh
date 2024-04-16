@@ -2,9 +2,6 @@
 
 . ./utils/initialize.sh
 
-# argument defaults
-arg_container_name="${arg_container_name:-$container_name}"
-
 # Fetch running tasks
 running_tasks=($(aws ecs list-tasks \
     --cluster $ecs_cluster \
@@ -21,6 +18,6 @@ echo "Selected task: $selected_task"
 aws ecs execute-command \
     --cluster $ecs_cluster \
     --task $selected_task \
-    --container $arg_container_name \
+    --container $container_name \
     --interactive \
     --command "/bin/bash"
