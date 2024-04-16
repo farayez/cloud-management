@@ -1,6 +1,10 @@
 # cloud-management
 A compilation of scripts to deploy, configure, and manage services on the cloud.
 
+# Requirements
+- [Install the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+
 # Disclaimers
 - Project under development
 - Only works with AWS
@@ -12,6 +16,8 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 - Make a copy of `services/example` directory and name it accordingly.
     - Example: `myApp-backend-staging`
 - Populate variables inside `services/myApp-backend-staging/set_variables.sh` based on your needs.
+- Make a copy of `.aws/config.example` and `.aws/credentials.example`. Name the new files `config` and `credentials` respectively.
+- Populate newly created `.aws/config` and `.aws/credentials` files with configurations from AWS. Follow the format from [Authenticate with short-term credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-short-term.html)
 
 ## Build and push application image
 - Clone application repository into `repos/`

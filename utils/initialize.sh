@@ -19,6 +19,11 @@ home_directory=$(pwd)
 . ./services/$service_name/set_variables.sh || exit 1
 . ./utils/parse_arguments.sh || exit 1
 
+# Set AWS Configuration Env Variables
+export AWS_SHARED_CREDENTIALS_FILE=$home_directory/.aws/credentials
+export AWS_CONFIG_FILE=$home_directory/.aws/config
+export AWS_PROFILE=$aws_profile
+
 # CD into services directory
 cd ./services/$service_name || exit 1
 

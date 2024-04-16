@@ -2,6 +2,7 @@
 
 # General AWS Settings
 aws_region="me-central-1"
+aws_profile="default"
 
 # SSM Parameter Store
 ssm_param_name="/test-application/staging/env"
