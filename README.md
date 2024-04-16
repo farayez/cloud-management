@@ -15,9 +15,12 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 ## Setup
 - Make a copy of `services/example` directory and name it accordingly.
     - Example: `myApp-backend-staging`
-- Populate variables inside `services/myApp-backend-staging/set_variables.sh` based on your needs.
+- Populate variables inside `services/<service_name>/set_variables.sh` based on your needs.
 - Make a copy of `.aws/config.example` and `.aws/credentials.example`. Name the new files `config` and `credentials` respectively.
 - Populate newly created `.aws/config` and `.aws/credentials` files with configurations from AWS. Follow the format from [Authenticate with short-term credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-short-term.html)
+- The AWS Profile configured in `.aws/config` and `.aws/credentials` files can be used in 2 ways:
+    - By passing argument `aws_profile=<custom-profile>` with the command.
+    - By adding `aws_profile="<custom-profile>"` in `services/<service-name>/set_variables.sh` file.
 
 ## Build and push application image
 - Clone application repository into `repos/`
@@ -25,7 +28,7 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 - Docker must be running
 - Command to build docker image and push to AWS ECR
     ```bash
-    ./push-image.sh myApp-backend-staging
+    ./push-image.sh <service_name>
     ```
 
 #### Required variables
@@ -37,13 +40,13 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 - ecr_url
 
 ## Start / Stop (or redeploy) ECS Service
-- Command to start / redeploy:
+- Command to start / redeploy with a desired task count of 1:
     ```bash
-    ./start-service.sh myApp-backend-staging
+    ./start-service.sh <service_name>
     ```
 - Command to stop service:
     ```bash
-    ./stop-service.sh myApp-backend-staging
+    ./stop-service.sh <service_name>
     ```
 
 #### Required variables
@@ -54,7 +57,7 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
 ## Exec into a running container on ECS
 - Command to exec into a container:
     ```bash
-    ./exec-container.sh myApp-backend-staging
+    ./exec-container.sh <service_name>
     ```
 
 #### Required variables
@@ -69,14 +72,14 @@ Environment variables can be passed in bulk to the application using `AWS SSM Pa
 > Note: **.env file cannot contain the string *|EOL|* anywhere inside its content**
 
 - Populate required variables
-- Copy the .env file inside services folder (`services/myApp-backend-staging/.env`)
+- Copy the .env file inside services folder (`services/<service_name>/.env`)
 - Command to push local .env file to Parameter Store
     ```bash
-    ./push-env.sh myApp-backend-staging
+    ./push-env.sh <service_name>
     ```
 - Command to pull .env file from Parameter Store
     ```bash
-    ./pull-env.sh myApp-backend-staging
+    ./pull-env.sh <service_name>
     ```
 
 #### Required variables
@@ -84,10 +87,16 @@ Environment variables can be passed in bulk to the application using `AWS SSM Pa
     - ssm_param_name
 
 ## History
-Significant responses and file changes are recorded in `services/myApp-backend-staging/history` directory.
+Significant responses and file changes are recorded in `services/<service_name>/history` directory.
 
 - Response from `aws ecs update-service` command
 - .env file history during push and pull
 
-## Tmp
-The `services/myApp-backend-staging/history` can be removed at any point.
+## Tmp Directory
+The `services/<service_name>/history` can be removed at any point.
+
+## Command arguments
+Any variable defined in `services/<service-name>/set_variables.sh` can be overwritten by passing `<variable_name>=<new_value>` as a command argument. Example:
+```bash
+./view-variables.sh example aws_region=us-east-1 ssm_param_name="/new/parameter"
+```
