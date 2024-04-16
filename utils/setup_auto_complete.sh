@@ -12,3 +12,4 @@ complete -F _command_complete ./push-image.sh
 complete -F _command_complete ./start-service.sh
 complete -F _command_complete ./stop-service.sh
 complete -F _command_complete ./view-variables.sh
+complete -F _command_complete ./test.sh

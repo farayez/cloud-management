@@ -86,6 +86,13 @@ Environment variables can be passed in bulk to the application using `AWS SSM Pa
     - aws_region
     - ssm_param_name
 
+## Test
+`test.sh` can be called to run any custom command specified in its 2nd argument. This can be used to test the AWS integration. Example:
+```bash
+./test.sh example "aws sts get-caller-identity"
+./test.sh example "aws configure list"
+```
+
 ## History
 Significant responses and file changes are recorded in `services/<service_name>/history` directory.
 
