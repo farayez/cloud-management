@@ -1,0 +1,109 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Push Image",
+      "type": "shell",
+      "command": "./push-image.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Start Service",
+      "type": "shell",
+      "command": "./start-service.sh",
+      "args": ["${input:service}", "desired_count=${input:desiredCount}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Stop Service",
+      "type": "shell",
+      "command": "./stop-service.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Exec into Container",
+      "type": "shell",
+      "command": "./exec-container.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "Pull Env",
+      "type": "shell",
+      "command": "./pull-env.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Push Env",
+      "type": "shell",
+      "command": "./push-env.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Test Integration",
+      "type": "shell",
+      "command": "./test.sh",
+      "args": ["${input:service}", "${input:testCommand}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "View Variables",
+      "type": "shell",
+      "command": "./view-variables.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "service",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which directory?",
+        "include": "services/*/*",
+        "transform": { "text": "${fileBasename}" },
+        "showDirs": true,
+        "keyRemember": "selectedService"
+      }
+    },
+    {
+      "id": "testCommand",
+      "type": "promptString",
+      "default": "aws sts get-caller-identity",
+      "description": "Command to execute"
+    },
+    {
+      "id": "desiredCount",
+      "type": "promptString",
+      "default": "1",
+      "description": "Desired task count in service"
+    }
+  ]
+}
