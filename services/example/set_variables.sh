@@ -8,6 +8,7 @@ aws_profile="default"
 ssm_param_name="/test-application/staging/env"
 
 # ECR
+ecr_aws_region="me-central-1"
 ecr_url="000000000000.dkr.ecr.me-central-1.amazonaws.com"
 image_url="000000000000.dkr.ecr.me-central-1.amazonaws.com/test-application"
 image_name="test-application"
