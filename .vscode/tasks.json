@@ -22,6 +22,15 @@
       }
     },
     {
+      "label": "Redeploy Service",
+      "type": "shell",
+      "command": "./redeploy-service.sh",
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
       "label": "Stop Service",
       "type": "shell",
       "command": "./stop-service.sh",

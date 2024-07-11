@@ -30,23 +30,28 @@ A compilation of scripts to deploy, configure, and manage services on the cloud.
     ```bash
     ./push-image.sh <service_name>
     ```
+- Remote repository URL is `<image_url>:<branch>.latest`
 
 #### Required variables
-- aws_region
+- ecr_aws_region
 - codebase_directory
 - branch
 - image_name
 - image_url
 - ecr_url
 
-## Start / Stop (or redeploy) ECS Service
-- Command to start / redeploy with a desired task count of 1:
+## Start / Stop / Redeploy ECS Service
+- Command to start with a desired task count of 1:
     ```bash
     ./start-service.sh <service_name>
     ```
 - Command to stop service:
     ```bash
     ./stop-service.sh <service_name>
+    ```
+- Command to redeploy service:
+    ```bash
+    ./redeploy-service.sh <service_name>
     ```
 
 #### Required variables
