@@ -47,7 +47,7 @@
       "presentation": {
         "reveal": "always",
         "focus": true,
-        "panel": "shared",
+        "panel": "new",
         "showReuseMessage": false,
         "clear": false
       }
