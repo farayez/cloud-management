@@ -18,6 +18,7 @@ branch="main"
 ecs_cluster=staging-serverless
 ecs_service=test-application-staging-01
 container_name=$image_name
+task_definition=test-task-definition
 
 # Codebase
 codebase_directory="test-application-repo"

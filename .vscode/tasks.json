@@ -31,6 +31,18 @@
       }
     },
     {
+      "label": "Update Service",
+      "type": "shell",
+      "command": "./update-service.sh",
+      "args": [
+        "${input:service}",
+        "task_definition_revision=${input:taskDefinitionRevision}"
+      ],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
       "label": "Stop Service",
       "type": "shell",
       "command": "./stop-service.sh",
@@ -112,6 +124,12 @@
       "id": "desiredCount",
       "type": "promptString",
       "default": "1",
+      "description": "Desired task count in service"
+    },
+    {
+      "id": "taskDefinitionRevision",
+      "type": "promptString",
+      "default": "",
       "description": "Desired task count in service"
     }
   ]
