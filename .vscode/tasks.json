@@ -6,8 +6,8 @@
     {
       "label": "Push Image",
       "type": "shell",
-      "command": "./push-image.sh",
-      "args": ["${input:service}"],
+      "command": "npm",
+      "args": ["run", "image:push", "${input:service}"],
       "presentation": {
         "showReuseMessage": false
       }

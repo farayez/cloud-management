@@ -1,0 +1,6 @@
+{
+  "name": "cloud-management",
+  "scripts": {
+    "image:push": "./scripts/push-image.sh"
+  }
+}
