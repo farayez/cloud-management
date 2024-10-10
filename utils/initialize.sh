@@ -3,6 +3,11 @@
 # Set up autocomplete for commands
 . ./utils/setup_auto_complete.sh
 
+# Declare functions
+. ./utils/declare_functions.sh
+
+define_console_colors
+
 # Validate service directory and set service_name
 if [ -z $1 ] || [ ! -d ./services/$1 ]; then
     echo ERROR: 1st argument must point to the directory associated with a service
