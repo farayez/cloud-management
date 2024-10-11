@@ -10,16 +10,18 @@ input_text "Enter service name: " service_name
 
 if [ -z "${service_name}" ]; then
     error "Service name must be provided for initializtion"
-    exit 2
+    fatal
 fi
 
 if [ -d "services/$service_name" ]; then
     error "Service already initiated"
-    exit 2
+    fatal
 fi
 
 mkdir services/$service_name || fatal
-section "Service directory created"
+section_end "Service directory created"
 
 cp utils/config_template.sh services/$service_name/set_variables.sh || fatal
-section "Config template generated"
+section_end "Config template generated"
+
+success "Service Initialized"
