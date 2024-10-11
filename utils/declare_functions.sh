@@ -2,7 +2,7 @@
 
 # Function to validate variables
 validate_variables() {
-    info "\nCONFIG VALIDATION"
+    # info "\nCONFIG VALIDATION"
 
     local variable
     local validated=1
@@ -18,7 +18,8 @@ validate_variables() {
         fatal "Config validation failed"
     fi
 
-    echo -e "Successful"
+
+    info "\nCONFIG VALIDATION SUCCESSFUL"
 }
 
 # Echo all variables
@@ -85,7 +86,7 @@ info() {
     echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_COLOR_DEFAULT"
 }
 error() {
-    echo -e "$CONSOLE_COLOR_RED$@$CONSOLE_COLOR_DEFAULT"
+    echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT"
 }
 debug() {
     echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_COLOR_DEFAULT"
@@ -94,7 +95,13 @@ warning() {
     echo -e "$CONSOLE_COLOR_YELLOW$@$CONSOLE_COLOR_DEFAULT"
 }
 section() {
-    echo -e "$CONSOLE_COLOR_PURPLE$@$CONSOLE_COLOR_DEFAULT"
+    echo -e "\n$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
+}
+section_end() {
+    echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT\n"
+}
+success() {
+    echo -e "\n${CONSOLE_COLOR_LIGHT_GREEN}SUCCESS: $CONSOLE_COLOR_GREEN${@^^}$CONSOLE_COLOR_DEFAULT\n"
 }
 
 # Ask for user input
@@ -107,9 +114,9 @@ input_text() {
 # Fatal Error
 fatal() {
     if [ "$#" -lt 1 ]; then
-        error "\nEXECUTION FAILED"
+        echo -e "\n${CONSOLE_COLOR_RED}EXECUTION FAILED$CONSOLE_COLOR_DEFAULT"
     else
-        error "\n${1^^}"
+        echo -e "\n$CONSOLE_COLOR_RED${1^^}$CONSOLE_COLOR_DEFAULT"
     fi
 
     exit 1
