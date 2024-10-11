@@ -1,6 +1,7 @@
 {
   "name": "cloud-management",
   "scripts": {
+    "service:init": "./utils/initialize_service.sh",
     "image:push": "./scripts/push-image.sh"
   }
 }
