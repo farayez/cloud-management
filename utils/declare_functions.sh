@@ -28,16 +28,16 @@ print_variables() {
     if [ "$#" -lt 1 ]; then
         list_declared_variables
 
-        echo -e "total variables $CONSOLE_COLOR_YELLOW${#declared_variables[@]}$CONSOLE_NO_COLOR"
+        echo -e "total variables $CONSOLE_COLOR_YELLOW${#declared_variables[@]}$CONSOLE_COLOR_DEFAULT"
 
         for variable in ${declared_variables[@]}
         do
-            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_NO_COLOR = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_NO_COLOR
+            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     else
         for variable in $@
         do
-            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_NO_COLOR = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_NO_COLOR
+            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     fi
 
@@ -67,22 +67,50 @@ define_console_colors() {
     CONSOLE_COLOR_LIGHT_PURPLE='\033[1;35m'
     CONSOLE_COLOR_LIGHT_CYAN='\033[1;36m'
     CONSOLE_COLOR_WHITE='\033[1;37m'
-    CONSOLE_NO_COLOR='\033[0m'
+    CONSOLE_COLOR_DEFAULT='\033[0m'
+}
+demo_colors() {
+    declared_colors=($(compgen -A variable | grep '^CONSOLE_COLOR_*'))
+
+    for variable in ${declared_colors[@]}
+    do
+        echo -e ${!variable}$variable$CONSOLE_COLOR_DEFAULT
+    done
+
+    unset declared_colors
 }
 
 # Echo alternatives
 info() {
-    echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_NO_COLOR"
+    echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_COLOR_DEFAULT"
 }
 error() {
-    echo -e "$CONSOLE_COLOR_RED$@$CONSOLE_NO_COLOR"
+    echo -e "$CONSOLE_COLOR_RED$@$CONSOLE_COLOR_DEFAULT"
 }
 debug() {
-    echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_NO_COLOR"
+    echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_COLOR_DEFAULT"
 }
 warning() {
-    echo -e "$CONSOLE_COLOR_YELLOW$@$CONSOLE_NO_COLOR"
+    echo -e "$CONSOLE_COLOR_YELLOW$@$CONSOLE_COLOR_DEFAULT"
 }
 section() {
-    echo -e "$CONSOLE_COLOR_PURPLE$@$CONSOLE_NO_COLOR"
+    echo -e "$CONSOLE_COLOR_PURPLE$@$CONSOLE_COLOR_DEFAULT"
+}
+
+# Ask for user input
+input_text() {
+    echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_LIGHT_GREEN"
+    read $2
+    echo -e "$CONSOLE_COLOR_DEFAULT"
+}
+
+# Fatal Error
+fatal() {
+    if [ "$#" -lt 1 ]; then
+        error "Execution Failed"
+    else
+        error $1
+    fi
+
+    exit 1
 }
