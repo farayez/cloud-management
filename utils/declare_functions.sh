@@ -1,33 +1,31 @@
 #!/bin/bash
 
 # Function to validate variables
-validate_variables() {
-    # info "\nCONFIG VALIDATION"
-
+fn_validate_variables() {
     local variable
     local validated=1
     for variable in $@
     do
         if [ -z "${!variable}" ]; then
-            error "$variable must be set"
+            fn_error "$variable must be set"
             validated=0
         fi
     done
 
     if [ $validated -eq 0 ]; then
-        fatal "Config validation failed"
+        fn_fatal "Config validation failed"
     fi
 
 
-    info "\nCONFIG VALIDATION SUCCESSFUL"
+    fn_info "\nCONFIG VALIDATION SUCCESSFUL"
 }
 
 # Echo all variables
-print_variables() {
+fn_print_variables() {
     local variable
 
     if [ "$#" -lt 1 ]; then
-        list_declared_variables
+        fn_list_declared_variables
 
         echo -e "total variables $CONSOLE_COLOR_YELLOW${#declared_variables[@]}$CONSOLE_COLOR_DEFAULT"
 
@@ -45,13 +43,13 @@ print_variables() {
 }
 
 # List all variables in declared_variables
-list_declared_variables() {
+fn_list_declared_variables() {
     unset declared_variables
     declared_variables=($(compgen -A variable | grep '^[a-z].*' | grep -v '^npm_*'))
 }
 
 # Setup Console Colors
-define_console_colors() {
+fn_define_console_colors() {
     CONSOLE_COLOR_BLACK='\033[0;30m'
     CONSOLE_COLOR_RED='\033[0;31m'
     CONSOLE_COLOR_GREEN='\033[0;32m'
@@ -70,7 +68,7 @@ define_console_colors() {
     CONSOLE_COLOR_WHITE='\033[1;37m'
     CONSOLE_COLOR_DEFAULT='\033[0m'
 }
-demo_colors() {
+fn_demo_colors() {
     declared_colors=($(compgen -A variable | grep '^CONSOLE_COLOR_*'))
 
     for variable in ${declared_colors[@]}
@@ -82,41 +80,44 @@ demo_colors() {
 }
 
 # Echo alternatives
-info() {
+fn_info() {
     echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_COLOR_DEFAULT"
 }
-error() {
+fn_error() {
     echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT"
 }
-debug() {
+fn_debug() {
     echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_COLOR_DEFAULT"
 }
-warning() {
+fn_warning() {
     echo -e "$CONSOLE_COLOR_YELLOW$@$CONSOLE_COLOR_DEFAULT"
 }
-section() {
+fn_section_start() {
     echo -e "\n$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
 }
-section_end() {
+fn_section_end() {
     echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT\n"
 }
-success() {
+fn_status() {
+    echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
+}
+fn_success() {
     echo -e "\n${CONSOLE_COLOR_LIGHT_GREEN}SUCCESS: $CONSOLE_COLOR_GREEN${@^^}$CONSOLE_COLOR_DEFAULT\n"
 }
 
 # Ask for user input
-input_text() {
+fn_input_text() {
     echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_GREEN"
     read $2
     echo -e "$CONSOLE_COLOR_DEFAULT"
 }
 
 # Fatal Error
-fatal() {
+fn_fatal() {
     if [ "$#" -lt 1 ]; then
-        echo -e "\n${CONSOLE_COLOR_RED}EXECUTION FAILED$CONSOLE_COLOR_DEFAULT"
+        echo -e "\n${CONSOLE_COLOR_RED}EXECUTION FAILED$CONSOLE_COLOR_DEFAULT\n"
     else
-        echo -e "\n$CONSOLE_COLOR_RED${1^^}$CONSOLE_COLOR_DEFAULT"
+        echo -e "\n$CONSOLE_COLOR_RED${1^^}$CONSOLE_COLOR_DEFAULT\n"
     fi
 
     exit 1
