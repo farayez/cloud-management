@@ -2,20 +2,20 @@
 
 # Function to validate variables
 validate_variables() {
-    info "\nVariable Validation"
+    info "\nCONFIG VALIDATION"
 
     local variable
     local validated=1
     for variable in $@
     do
-        if [ ! -v ${variable} ]; then
+        if [ -z "${!variable}" ]; then
             error "$variable must be set"
             validated=0
         fi
     done
 
     if [ $validated -eq 0 ]; then
-        exit 2
+        fatal "Config validation failed"
     fi
 
     echo -e "Successful"
@@ -32,12 +32,12 @@ print_variables() {
 
         for variable in ${declared_variables[@]}
         do
-            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
+            echo -e $CONSOLE_COLOR_LIGHT_GRAY$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     else
         for variable in $@
         do
-            echo -e $CONSOLE_COLOR_WHITE$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
+            echo -e $CONSOLE_COLOR_LIGHT_GRAY$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     fi
 
@@ -99,7 +99,7 @@ section() {
 
 # Ask for user input
 input_text() {
-    echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_LIGHT_GREEN"
+    echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_GREEN"
     read $2
     echo -e "$CONSOLE_COLOR_DEFAULT"
 }
@@ -107,9 +107,9 @@ input_text() {
 # Fatal Error
 fatal() {
     if [ "$#" -lt 1 ]; then
-        error "Execution Failed"
+        error "\nEXECUTION FAILED"
     else
-        error $1
+        error "\n${1^^}"
     fi
 
     exit 1
