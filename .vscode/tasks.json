@@ -24,8 +24,8 @@
     {
       "label": "Redeploy Service",
       "type": "shell",
-      "command": "./redeploy-service.sh",
-      "args": ["${input:service}"],
+      "command": "npm",
+      "args": ["run", "ecs:redeploy_service", "${input:service}"],
       "presentation": {
         "showReuseMessage": false
       }

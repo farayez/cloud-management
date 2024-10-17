@@ -84,7 +84,7 @@ fn_info() {
     echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_COLOR_DEFAULT"
 }
 fn_error() {
-    echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT"
+    echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT" >&2
 }
 fn_debug() {
     echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_COLOR_DEFAULT"
@@ -121,4 +121,51 @@ fn_fatal() {
     fi
 
     exit 1
+}
+
+# Declare an associative array to map keys to commands
+declare -A command_map=(
+    ["update-service"]="aws ecs update-service"
+    ["list-buckets"]="aws s3 ls"
+)
+
+# Function to run a command and handle success/error outputs
+fn_run() {
+    local key="$1"  # First parameter is the command key
+    shift           # Shift to access remaining parameters as command arguments
+
+    # Check if the key exists in the command map
+    if [[ -z "${command_map[$key]}" ]]; then
+        echo "Error: Command key '$key' not found in the map."
+        return 1
+    fi
+
+    local cmd="${command_map[$key]}"  # Get the command from the map
+    local timestamp=$(date +"%Y%m%d_%H%M%S")  # Current 
+
+    # Ensure the command history directory exists
+    local history_directory="history/$key"
+    mkdir -p "history/$key" || { fn_error "Could not create directory $history_directory"; return 1; }
+
+    local history_file="$history_directory/${timestamp}.history"
+    echo -e "---------- COMMAND ----------\n$cmd" "$@" > "$history_file"
+
+    # Run the mapped command with its arguments and capture output or error
+    if output=$($cmd "$@" 2>&1); then
+        # Command succeeded
+        # echo "Success: $output"
+
+        # Save the result to a history file
+        echo "---------- SUCCESS ----------" >> "$history_file"
+        echo "$output" >> "$history_file"
+        return 0
+    else
+        # Command failed
+        fn_error "$output"
+
+        # Save the error to a history file
+        echo "---------- ERROR ----------" >> "$history_file"
+        echo "$output" >> "$history_file"
+        return 1
+    fi
 }

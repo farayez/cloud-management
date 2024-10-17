@@ -2,6 +2,8 @@
   "name": "cloud-management",
   "scripts": {
     "service:init": "./utils/initialize_service.sh",
-    "image:push": "./scripts/push-image.sh"
+    "service:clear_history": "./scripts/clear_history.sh",
+    "image:push": "./scripts/push-image.sh",
+    "ecs:redeploy_service": "./scripts/redeploy_service.sh"
   }
 }
