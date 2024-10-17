@@ -127,6 +127,7 @@ fn_fatal() {
 declare -A command_map=(
     ["update-service"]="aws ecs update-service"
     ["list-buckets"]="aws s3 ls"
+    ["codedeploy-deploy"]="aws deploy create-deployment"
 )
 
 # Function to run a command and handle success/error outputs
@@ -169,3 +170,53 @@ fn_run() {
         return 1
     fi
 }
+
+# Get CodeDeploy revision config
+fn_get_codedeploy_revision_json() {
+    local task_definition_arn="$1"
+    local container_name="$2"
+    local container_port="$3"
+
+    # Parameter checking
+    if [[ -z "$task_definition_arn" || -z "$container_name" || -z "$container_port" ]]; then
+        echo "Error: Missing required parameters."
+        return 1
+    fi
+
+     # Create the content JSON and encode it as a string
+    local content_json
+    content_json=$(jq -n --arg taskDef "$task_definition_arn" \
+                          --arg contName "$container_name" \
+                          --argjson contPort "$container_port" \
+    '{
+      version: 1,
+      Resources: [
+        {
+          TargetService: {
+            Type: "AWS::ECS::Service",
+            Properties: {
+              TaskDefinition: $taskDef,
+              LoadBalancerInfo: {
+                ContainerName: $contName,
+                ContainerPort: $contPort
+              }
+            }
+          }
+        }
+      ]
+    }' | jq -c '.')  # Compact the JSON into a single line
+
+    # Create the revision JSON, ensuring the content is string-encoded
+    local revision_json
+    revision_json=$(jq -n --arg content "$content_json" \
+    '{
+      revisionType: "AppSpecContent",
+      appSpecContent: {
+        content: $content
+      }
+    }')
+
+    # Print the final single-line JSON
+    echo "$revision_json" | jq -c '.'
+}
+
