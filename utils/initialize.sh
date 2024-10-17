@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Generate Execution ID
+current_execution_id=$(date +%Y_%m_%d_%H%M%S)
+
+current_script_name=$(basename "$0" .sh)
+
 # Set up autocomplete for commands
 . ./utils/setup_auto_complete.sh
 
@@ -13,7 +18,7 @@ if [ -z $1 ] || [ ! -d ./services/$1 ]; then
     echo ERROR: 1st argument must point to the directory associated with a service
     exit 1
 fi
-service_name=$1;
+service_name=$1
 
 # Set timestamp for history
 timestamp=$(date +%Y_%m_%d_%H%M%S)

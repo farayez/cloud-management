@@ -4,8 +4,7 @@
 fn_validate_variables() {
     local variable
     local validated=1
-    for variable in $@
-    do
+    for variable in $@; do
         if [ -z "${!variable}" ]; then
             fn_error "$variable must be set"
             validated=0
@@ -15,7 +14,6 @@ fn_validate_variables() {
     if [ $validated -eq 0 ]; then
         fn_fatal "Config validation failed"
     fi
-
 
     fn_info "\nCONFIG VALIDATION SUCCESSFUL"
 }
@@ -29,13 +27,11 @@ fn_print_variables() {
 
         echo -e "total variables $CONSOLE_COLOR_YELLOW${#declared_variables[@]}$CONSOLE_COLOR_DEFAULT"
 
-        for variable in ${declared_variables[@]}
-        do
+        for variable in ${declared_variables[@]}; do
             echo -e $CONSOLE_COLOR_LIGHT_GRAY$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     else
-        for variable in $@
-        do
+        for variable in $@; do
             echo -e $CONSOLE_COLOR_LIGHT_GRAY$variable$CONSOLE_COLOR_DEFAULT = $CONSOLE_COLOR_BLACK${!variable}$CONSOLE_COLOR_DEFAULT
         done
     fi
@@ -71,8 +67,7 @@ fn_define_console_colors() {
 fn_demo_colors() {
     declared_colors=($(compgen -A variable | grep '^CONSOLE_COLOR_*'))
 
-    for variable in ${declared_colors[@]}
-    do
+    for variable in ${declared_colors[@]}; do
         echo -e ${!variable}$variable$CONSOLE_COLOR_DEFAULT
     done
 
@@ -132,8 +127,8 @@ declare -A command_map=(
 
 # Function to run a command and handle success/error outputs
 fn_run() {
-    local key="$1"  # First parameter is the command key
-    shift           # Shift to access remaining parameters as command arguments
+    local key="$1" # First parameter is the command key
+    shift          # Shift to access remaining parameters as command arguments
 
     # Check if the key exists in the command map
     if [[ -z "${command_map[$key]}" ]]; then
@@ -141,15 +136,20 @@ fn_run() {
         return 1
     fi
 
-    local cmd="${command_map[$key]}"  # Get the command from the map
-    local timestamp=$(date +"%Y%m%d_%H%M%S")  # Current 
+    local cmd="${command_map[$key]}"             # Get the command from the map
+    local timestamp=$(date +"%Y-%m-%d_%H:%M:%S") # Current
 
     # Ensure the command history directory exists
-    local history_directory="history/$key"
-    mkdir -p "history/$key" || { fn_error "Could not create directory $history_directory"; return 1; }
+    local history_directory="history/$current_script_name"
+    mkdir -p "$history_directory" || {
+        fn_error "Could not create directory $history_directory"
+        return 1
+    }
 
-    local history_file="$history_directory/${timestamp}.history"
-    echo -e "---------- COMMAND ----------\n$cmd" "$@" > "$history_file"
+    local history_file="$history_directory/${current_execution_id}.history"
+    touch "$history_file"
+    echo -e "---------- START\nTIMESTAMP: ${timestamp}" >>"$history_file"
+    echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"
 
     # Run the mapped command with its arguments and capture output or error
     if output=$($cmd "$@" 2>&1); then
@@ -157,16 +157,16 @@ fn_run() {
         # echo "Success: $output"
 
         # Save the result to a history file
-        echo "---------- SUCCESS ----------" >> "$history_file"
-        echo "$output" >> "$history_file"
+        echo "---------- SUCCESS" >>"$history_file"
+        echo "$output" >>"$history_file"
         return 0
     else
         # Command failed
         fn_error "$output"
 
         # Save the error to a history file
-        echo "---------- ERROR ----------" >> "$history_file"
-        echo "$output" >> "$history_file"
+        echo "---------- ERROR" >>"$history_file"
+        echo "$output" >>"$history_file"
         return 1
     fi
 }
@@ -183,12 +183,12 @@ fn_get_codedeploy_revision_json() {
         return 1
     fi
 
-     # Create the content JSON and encode it as a string
+    # Create the content JSON and encode it as a string
     local content_json
     content_json=$(jq -n --arg taskDef "$task_definition_arn" \
-                          --arg contName "$container_name" \
-                          --argjson contPort "$container_port" \
-    '{
+        --arg contName "$container_name" \
+        --argjson contPort "$container_port" \
+        '{
       version: 1,
       Resources: [
         {
@@ -204,12 +204,12 @@ fn_get_codedeploy_revision_json() {
           }
         }
       ]
-    }' | jq -c '.')  # Compact the JSON into a single line
+    }' | jq -c '.') # Compact the JSON into a single line
 
     # Create the revision JSON, ensuring the content is string-encoded
     local revision_json
     revision_json=$(jq -n --arg content "$content_json" \
-    '{
+        '{
       revisionType: "AppSpecContent",
       appSpecContent: {
         content: $content
@@ -219,4 +219,3 @@ fn_get_codedeploy_revision_json() {
     # Print the final single-line JSON
     echo "$revision_json" | jq -c '.'
 }
-
