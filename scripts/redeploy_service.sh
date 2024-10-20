@@ -19,6 +19,7 @@ if [[ -n "$codedeploy_application_name" ]]; then
         --task-definition $task_definition \
         --query 'taskDefinition.taskDefinitionArn' \
         --output text)
+    fn_info "Latest task ARN: $task_definition_latest_arn"
 
     revision_json=$(fn_get_codedeploy_revision_json "$task_definition_latest_arn" "$container_name" "$container_port")
     if [[ $? -ne 0 ]]; then
