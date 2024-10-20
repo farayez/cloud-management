@@ -4,6 +4,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Initialize Service",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "service:init"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
       "label": "Push Image",
       "type": "shell",
       "command": "npm",
@@ -130,7 +139,7 @@
       "id": "taskDefinitionRevision",
       "type": "promptString",
       "default": "",
-      "description": "Desired task count in service"
+      "description": "Task definition revision"
     }
   ]
 }

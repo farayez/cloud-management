@@ -23,3 +23,7 @@ ecs_cluster=
 ecs_service=
 container_name=
 task_definition=
+
+# CodeDeploy (For blue/green deployments)
+# codedeploy_application_name=
+# codedeploy_group_name=
