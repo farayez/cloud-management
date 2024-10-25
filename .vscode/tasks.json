@@ -49,6 +49,19 @@
       }
     },
     {
+      "label": "Exec into Container",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "ecs:exec_container", "${input:service}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
       "label": "Update Service",
       "type": "shell",
       "command": "./update-service.sh",
@@ -58,19 +71,6 @@
       ],
       "presentation": {
         "showReuseMessage": false
-      }
-    },
-    {
-      "label": "Exec into Container",
-      "type": "shell",
-      "command": "./exec-container.sh",
-      "args": ["${input:service}"],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "new",
-        "showReuseMessage": false,
-        "clear": false
       }
     },
     {

@@ -6,6 +6,7 @@
     "image:push": "./scripts/push-image.sh",
     "ecs:redeploy_service": "./scripts/redeploy_service.sh",
     "ecs:stop_service": "./scripts/stop-service.sh",
-    "ecs:start_service": "./scripts/start-service.sh"
+    "ecs:start_service": "./scripts/start-service.sh",
+    "ecs:exec_container": "./scripts/exec-container.sh"
   }
 }
