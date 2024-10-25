@@ -13,6 +13,6 @@ fn_run update-service \
     --service $ecs_service \
     --region $aws_region \
     --force-new-deployment \
-    --desired-count 0
+    --desired-count 0 || fn_fatal
 
 fn_success "ECS Service STOP initiated"

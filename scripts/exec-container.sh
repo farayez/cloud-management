@@ -26,4 +26,4 @@ aws ecs execute-command \
     --task $selected_task \
     --container $container_name \
     --interactive \
-    --command "/bin/bash"
+    --command "/bin/bash" || fn_fatal
