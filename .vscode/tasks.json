@@ -24,8 +24,17 @@
     {
       "label": "Start Service",
       "type": "shell",
-      "command": "./start-service.sh",
-      "args": ["${input:service}", "desired_count=${input:desiredCount}"],
+      "command": "npm",
+      "args": ["run", "ecs:start_service", "${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Stop Service",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "ecs:stop_service", "${input:service}"],
       "presentation": {
         "showReuseMessage": false
       }
@@ -47,15 +56,6 @@
         "${input:service}",
         "task_definition_revision=${input:taskDefinitionRevision}"
       ],
-      "presentation": {
-        "showReuseMessage": false
-      }
-    },
-    {
-      "label": "Stop Service",
-      "type": "shell",
-      "command": "./stop-service.sh",
-      "args": ["${input:service}"],
       "presentation": {
         "showReuseMessage": false
       }
