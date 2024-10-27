@@ -4,7 +4,7 @@
     "service:init": "./utils/initialize_service.sh",
     "resource:init": "./utils/initialize_resource.sh",
     "service:clear_history": "./scripts/clear_history.sh",
-    "image:push": "./scripts/push-image.sh",
+    "image:push": "./scripts/push_image.sh",
     "ecs:redeploy_service": "./scripts/redeploy_service.sh",
     "ecs:stop_service": "./scripts/stop-service.sh",
     "ecs:start_service": "./scripts/start-service.sh",

@@ -1,42 +1,36 @@
 #!/bin/bash
 
-# Generate Execution ID
+# Generate context identifiers
 current_execution_id=$(date +%Y_%m_%d_%H%M%S)
-
 current_script_name=$(basename "$0" .sh)
+timestamp=$(date +%Y_%m_%d_%H%M%S)
 
-# Set up autocomplete for commands
-. ./utils/setup_auto_complete.sh
+# Set root directory
+root_directory=$(pwd)
+
+# Define constants
+. ./utils/define_constants.sh
 
 # Declare functions
 . ./utils/declare_functions.sh
 
+# Configure console
 fn_define_console_colors
 
-# Validate service directory and set service_name
-if [ -z $1 ] || [ ! -d ./services/$1 ]; then
-    echo ERROR: 1st argument must point to the directory associated with a service
-    exit 1
-fi
-service_name=$1
+# Populate execution variables
+fn_populate_and_validate_resource_tag_from_current_script_name
+fn_populate_and_validate_resource_directory_from_resource_tag
+fn_populate_and_validate_resource_name $1
+fn_populate_and_validate_execution_directory
 
-# Set timestamp for history
-timestamp=$(date +%Y_%m_%d_%H%M%S)
-# Set home directory
-home_directory=$(pwd)
-
-# Parse variables and command arguments
-. ./services/$service_name/set_variables.sh || exit 1
-. ./utils/parse_arguments.sh || exit 1
+# Parse resource configuration and command arguments
+. $execution_directory/config.sh || exit 1
+fn_parse_arguments "$@" || exit 1
 
 # Set AWS Configuration Env Variables
-export AWS_SHARED_CREDENTIALS_FILE=$home_directory/.aws/credentials
-export AWS_CONFIG_FILE=$home_directory/.aws/config
+export AWS_SHARED_CREDENTIALS_FILE=$root_directory/.aws/credentials
+export AWS_CONFIG_FILE=$root_directory/.aws/config
 export AWS_PROFILE=$aws_profile
 
-# CD into services directory
-cd ./services/$service_name || exit 1
-
-# Generate temporary directories if not present
-mkdir -p tmp
-mkdir -p history
+# CD into execution directory
+cd $execution_directory || exit 1
