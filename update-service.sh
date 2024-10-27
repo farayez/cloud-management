@@ -15,9 +15,9 @@ fi
 
 aws ecs update-service \
     --cluster $ecs_cluster \
-    --service $ecs_service  \
+    --service $ecs_service \
     --region $aws_region \
     $task_definition_param \
     --enable-execute-command \
     --force-new-deployment \
-    > history/ecs_update_$timestamp.json
+    >history/ecs_update_$timestamp.json
