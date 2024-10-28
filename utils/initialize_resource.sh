@@ -5,13 +5,7 @@
 
 fn_define_console_colors
 
-declare -A resource_tag_directory_map=(
-    ["image"]="images"
-    ["repo"]="repos"
-    ["ssm-parameter"]="ssm_parameters"
-    ["secret"]="secrets"
-    ["service"]="services"
-)
+. ./utils/define_constants.sh
 
 fn_request_mandatory_input() {
     local input_name=${1:-parameter}
@@ -27,36 +21,35 @@ fn_request_mandatory_input() {
 fn_create_resource_directory_from_user_input() {
     # First parameter is the resource tag
     # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service"
-    local resource_tag=$1
+    resource_tag=$1
+
+    # Validate resource_tag
     if [ -z "$resource_tag" ]; then
         fn_error "resource_tag must be provided"
         fn_fatal
     fi
-    directory=${resource_tag_directory_map[$resource_tag]}
-    if [ -z "$directory" ]; then
-        fn_error "Unsupported resource tag: $resource_tag"
-        fn_fatal
-    fi
+
+    fn_populate_and_validate_resource_directory_from_resource_tag
 
     # Get user input for name of resource
     fn_request_mandatory_input "$resource_tag name" resource_name
 
     # Create resource directory
-    if [ -d "$directory/$resource_name" ]; then
+    if [ -d "$resource_directory/$resource_name" ]; then
         fn_error "$resource_name $resource_tag already exists"
         fn_fatal
     fi
-    mkdir -p $directory/$resource_name || fn_fatal
+    mkdir -p $resource_directory/$resource_name || fn_fatal
 
-    fn_info "$directory/$resource_name directory created"
+    fn_info "$resource_directory/$resource_name directory created"
 }
 
 fn_copy_config_template() {
-    cp templates/$selected_resource.config.sh $directory/$resource_name/config.sh || fn_fatal
+    cp templates/$selected_resource.config.sh $resource_directory/$resource_name/config.sh || fn_fatal
     fn_info "Config template generated"
 }
 
-fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_directory_map[@]}"
+fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
 
 case $selected_resource in
 "repo")
