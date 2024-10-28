@@ -4,7 +4,7 @@
 
 if [[ -n "$codedeploy_application_name" ]]; then
     fn_info "Forcing deployment using CodeDeploy"
-    fn_validate_variables ecs_cluster ecs_service aws_region timestamp task_definition container_name container_port codedeploy_application_name codedeploy_group_name
+    fn_validate_variables ecs_cluster ecs_service aws_region timestamp task_definition primary_container_name primary_container_port codedeploy_application_name codedeploy_group_name
 
     fn_section_start "Updating Service"
     fn_run update-service \
@@ -12,6 +12,7 @@ if [[ -n "$codedeploy_application_name" ]]; then
         --service $ecs_service \
         --region $aws_region \
         --enable-execute-command
+    # --desired-count 6 \
 
     fn_section_start "Retrieving task definition ARN"
     task_definition_latest_arn=$(aws ecs describe-task-definition \
@@ -21,7 +22,7 @@ if [[ -n "$codedeploy_application_name" ]]; then
         --output text)
     fn_info "Latest task ARN: $task_definition_latest_arn"
 
-    revision_json=$(fn_get_codedeploy_revision_json "$task_definition_latest_arn" "$container_name" "$container_port")
+    revision_json=$(fn_get_codedeploy_revision_json "$task_definition_latest_arn" "$primary_container_name" "$primary_container_port")
     if [[ $? -ne 0 ]]; then
         fn_fatal "Failed to generate codedeploy revision JSON"
     fi
