@@ -17,8 +17,6 @@ fi
 
 fn_validate_variables image_url image_tag
 
-fn_print_variables root_directory repo branch aws_region ecr_url image_name image_url image_tag
-
 # Update codebase
 fn_section_start "Repo update"
 cd $root_directory/repos/$repo || exit 1
