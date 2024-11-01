@@ -16,7 +16,7 @@
       "label": "Push Image",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "image:push", "${input:service}"],
+      "args": ["run", "image:push", "${input:image}"],
       "presentation": {
         "showReuseMessage": false
       }
@@ -121,6 +121,18 @@
         "transform": { "text": "${fileBasename}" },
         "showDirs": true,
         "keyRemember": "selectedService"
+      }
+    },
+    {
+      "id": "image",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which directory?",
+        "include": "images/*/*",
+        "transform": { "text": "${fileBasename}" },
+        "showDirs": true,
+        "keyRemember": "selectedImage"
       }
     },
     {
