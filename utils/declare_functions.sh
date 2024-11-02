@@ -286,19 +286,21 @@ function fn_populate_and_validate_resource_directory_from_resource_tag() {
 function fn_populate_and_validate_resource_name() {
     resource_name=$1
 
+    # Validate resource_name argument
     if [ -z $resource_name ]; then
         fn_error "1st argument must be the name of the $resource_tag"
         fn_fatal
     fi
 
-    if [ ! -d $root_directory/$resource_directory/$resource_name ]; then
+    # Check for resource config
+    if [ ! -f "$resource_directory/$resource_name.config.sh" ]; then
         fn_error "No $resource_tag found with name $resource_name"
         fn_fatal
     fi
 }
 
-function fn_populate_and_validate_execution_directory() {
-    execution_directory=$root_directory/$resource_directory/$resource_name
+function fn_populate_and_validate_resource_config_file() {
+    resource_config_file="$resource_directory/$resource_name.config.sh"
 }
 
 function fn_parse_arguments() {
