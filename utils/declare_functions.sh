@@ -238,11 +238,11 @@ function fn_choose_from_menu() {
             fi
             index=$(($index + 1))
         done
-        read -s -n3 key               # wait for user to key in arrows or ENTER
-        if [[ $key == $esc[A ]]; then # up arrow
+        read -s -n3 key                # wait for user to key in arrows or ENTER
+        if [[ $key == $'\e[A' ]]; then # up arrow
             cur=$(($cur - 1))
             [ "$cur" -lt 0 ] && cur=0
-        elif [[ $key == $esc[B ]]; then # down arrow
+        elif [[ $key == $'\e[B' ]]; then # down arrow
             cur=$(($cur + 1))
             [ "$cur" -ge $count ] && cur=$(($count - 1))
         elif [[ $key == "" ]]; then # nothing, i.e the read delimiter - ENTER
