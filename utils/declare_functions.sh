@@ -272,6 +272,15 @@ function fn_populate_and_validate_resource_directory_from_resource_tag() {
         fn_error "Unsupported resource tag: $resource_tag"
         fn_fatal
     fi
+
+    # Prepend root directory
+    resource_directory="$root_directory/$resource_directory"
+
+    # Create resource directory if it doesn't exist
+    if [ ! -d $resource_directory ]; then
+        mkdir -p $resource_directory || fn_fatal
+        cp templates/resource.gitignore.template $resource_directory/.gitignore || fn_fatal
+    fi
 }
 
 function fn_populate_and_validate_resource_name() {
