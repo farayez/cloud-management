@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./utils/initialize.sh
+. ./utils/pre_execution.sh
 
 fn_validate_variables root_directory repo branch aws_region ecr_url image_name
 

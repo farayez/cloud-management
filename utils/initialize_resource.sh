@@ -81,8 +81,7 @@ case $selected_resource in
     fn_fatal "$selected_resource initialization not available yet"
     ;;
 "image")
-    fn_create_resource_directory_from_user_input $selected_resource
-    fn_copy_config_template
+    fn_create_resource_config_from_user_input $selected_resource
     ;;
 "ssm-parameter")
     fn_create_resource_config_from_user_input $selected_resource
@@ -91,8 +90,7 @@ case $selected_resource in
     fn_fatal "$selected_resource initialization not available yet"
     ;;
 "service")
-    fn_create_resource_directory_from_user_input $selected_resource
-    fn_copy_config_template
+    fn_create_resource_config_from_user_input $selected_resource
     ;;
 *)
     fn_fatal "invalid selection"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./utils/initialize.sh
+. ./utils/pre_execution.sh
 
 if [[ -n "$codedeploy_application_name" ]]; then
     fn_info "Forcing deployment using CodeDeploy"

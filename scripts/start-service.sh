@@ -3,7 +3,7 @@
 # argument defaults
 desired_count=1
 
-. ./utils/initialize.sh
+. ./utils/pre_execution.sh
 
 fn_section_start "Starting ECS service: $ecs_service"
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./utils/initialize.sh
+. ./utils/pre_execution.sh
 
 if [ "$stop_allowed" != "true" ]; then
     fn_fatal "Stop is not allowed"
