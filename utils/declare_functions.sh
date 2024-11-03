@@ -161,6 +161,7 @@ fn_run() {
         # Save the result to a history file
         echo "---------- SUCCESS" >>"$history_file"
         echo "$output" >>"$history_file"
+        echo "$output"
         return 0
     else
         # Command failed

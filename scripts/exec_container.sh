@@ -5,12 +5,12 @@
 fn_validate_variables ecs_cluster ecs_service aws_region timestamp root_directory primary_container_name
 
 # Fetch running tasks
-running_tasks=($(aws ecs list-tasks \
+running_tasks=($(fn_run ecs-list-tasks \
     --region $aws_region \
     --cluster $ecs_cluster \
     --output text \
     --query 'taskArns' \
-    --service $ecs_service))
+    --service $ecs_service)) || fn_fatal
 
 if [ -z "$running_tasks" ]; then
     fn_fatal "There's no running task"
