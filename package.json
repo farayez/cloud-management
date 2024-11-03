@@ -8,6 +8,8 @@
     "ecs:redeploy_service": "./scripts/redeploy_service.sh",
     "ecs:stop_service": "./scripts/stop-service.sh",
     "ecs:start_service": "./scripts/start-service.sh",
-    "ecs:exec_container": "./scripts/exec_container.sh"
+    "ecs:exec_container": "./scripts/exec_container.sh",
+    "ssm_parameter:pull": "./scripts/pull_ssm_parameter.sh",
+    "ssm_parameter:push": "./scripts/push_ssm_parameter.sh"
   }
 }

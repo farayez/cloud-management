@@ -125,6 +125,8 @@ declare -A command_map=(
     ["codedeploy-deploy"]="aws deploy create-deployment"
     ["ecs-list-tasks"]="aws ecs list-tasks"
     ["ecs-exec-command"]="aws ecs execute-command"
+    ["ssm-get-parameter"]="aws ssm get-parameter"
+    ["ssm-put-parameter"]="aws ssm put-parameter"
 )
 
 # Function to run a command and handle success/error outputs

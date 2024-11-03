@@ -12,6 +12,8 @@ declare -A script_name_to_resource_tag_map=(
     ["push_image"]="image"
     ["redeploy_service"]="service"
     ["exec_container"]="service"
+    ["pull_ssm_parameter"]="ssm-parameter"
+    ["push_ssm_parameter"]="ssm-parameter"
 )
 
 declare -A script_name_to_parameter_map=(
