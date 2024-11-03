@@ -123,6 +123,8 @@ declare -A command_map=(
     ["update-service"]="aws ecs update-service"
     ["list-buckets"]="aws s3 ls"
     ["codedeploy-deploy"]="aws deploy create-deployment"
+    ["ecs-list-tasks"]="aws ecs list-tasks"
+    ["ecs-exec-command"]="aws ecs execute-command"
 )
 
 # Function to run a command and handle success/error outputs
@@ -132,7 +134,7 @@ fn_run() {
 
     # Check if the key exists in the command map
     if [[ -z "${command_map[$key]}" ]]; then
-        echo "Error: Command key '$key' not found in the map."
+        fn_error "Error: Command key '$key' not found in the map."
         return 1
     fi
 
@@ -140,13 +142,13 @@ fn_run() {
     local timestamp=$(date +"%Y-%m-%d_%H:%M:%S") # Current
 
     # Ensure the command history directory exists
-    local history_directory="history/$current_script_name"
+    local history_directory="history/$resource_name"
     mkdir -p "$history_directory" || {
         fn_error "Could not create directory $history_directory"
         return 1
     }
 
-    local history_file="$history_directory/${current_execution_id}.history"
+    local history_file="$history_directory/${current_execution_id}.${current_script_name}.history"
     touch "$history_file"
     echo -e "---------- START\nTIMESTAMP: ${timestamp}" >>"$history_file"
     echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"

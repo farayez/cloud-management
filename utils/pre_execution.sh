@@ -18,4 +18,4 @@ export AWS_CONFIG_FILE=$root_directory/.aws/config
 export AWS_PROFILE=$aws_profile
 
 # CD into execution directory
-cd $execution_directory || exit 1
+cd $resource_directory || exit 1
