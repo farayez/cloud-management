@@ -131,6 +131,10 @@ declare -A command_map=(
 
 # Function to run a command and handle success/error outputs
 fn_run() {
+    # Initialize variables provided as arguments
+    local echo_response=false
+    local log_response=false
+
     local key="$1" # First parameter is the command key
     shift          # Shift to access remaining parameters as command arguments
 
@@ -140,8 +144,25 @@ fn_run() {
         return 1
     fi
 
-    local cmd="${command_map[$key]}"             # Get the command from the map
-    local timestamp=$(date +"%Y-%m-%d_%H:%M:%S") # Current
+    local timestamp=$(date +"%Y-%m-%d_%H:%M:%S") # Current timestamp
+
+    # Split the command string into command and arguments
+    IFS=',' read -r -a arguments <<<"${command_map[$key]}"
+
+    # Access the runtime arguments for the command
+    for value in "${arguments[@]:1}"; do
+        # Create local variables for each argument
+
+        # Remove the leading '--' and replace '-' with '_'
+        local variable_name="${value#--}"
+        variable_name="${variable_name//-/_}"
+
+        # Create the local variable and set it to true
+        local "$variable_name"=true
+    done
+
+    # Prepare the command to run
+    local cmd="${arguments[0]}"
 
     # Ensure the command history directory exists
     local history_directory="history/$resource_name"
@@ -155,7 +176,14 @@ fn_run() {
     echo -e "---------- START\nTIMESTAMP: ${timestamp}" >>"$history_file"
     echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"
 
-    # Run the mapped command with its arguments and capture output or error
+    # Run the command without capturing output or error
+    if $log_response; then
+        $cmd "$@" 2>&1
+        echo "---------- SUCCESS" >>"$history_file"
+        return 0
+    fi
+
+    # Run the command and capture output or error
     if output=$($cmd "$@" 2>&1); then
         # Command succeeded
         # echo "Success: $output"
@@ -163,7 +191,11 @@ fn_run() {
         # Save the result to a history file
         echo "---------- SUCCESS" >>"$history_file"
         echo "$output" >>"$history_file"
-        echo "$output"
+
+        if $echo_response; then
+            # Print the output. Can be captured in the parent script
+            echo "$output"
+        fi
         return 0
     else
         # Command failed
