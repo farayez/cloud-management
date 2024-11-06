@@ -22,10 +22,13 @@ fn_choose_from_menu "Select running task:" selected_task "${running_tasks[@]}"
 fn_info "Selected task: $selected_task"
 
 # Exec into container
-aws ecs execute-command \
+# aws ecs execute-command \
+fn_run ecs-exec-command \
     --region $aws_region \
     --cluster $ecs_cluster \
     --task $selected_task \
     --container $primary_container_name \
     --interactive \
     --command "/bin/bash" || fn_fatal
+
+fn_success "Execution completed inside container"

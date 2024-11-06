@@ -122,9 +122,9 @@ fn_fatal() {
 declare -A command_map=(
     ["update-service"]="aws ecs update-service"
     ["list-buckets"]="aws s3 ls"
-    ["codedeploy-deploy"]="aws deploy create-deployment"
-    ["ecs-list-tasks"]="aws ecs list-tasks"
-    ["ecs-exec-command"]="aws ecs execute-command"
+    ["codedeploy-deploy"]="aws deploy create-deployment,--echo-response"
+    ["ecs-list-tasks"]="aws ecs list-tasks,--echo-response"
+    ["ecs-exec-command"]="aws ecs execute-command,--log-response"
     ["ssm-get-parameter"]="aws ssm get-parameter"
     ["ssm-put-parameter"]="aws ssm put-parameter"
 )
