@@ -116,10 +116,20 @@
       "type": "command",
       "command": "extension.commandvariable.file.pickFile",
       "args": {
-        "description": "Which directory?",
-        "include": "services/*/*",
-        "transform": { "text": "${fileBasename}" },
-        "showDirs": true,
+        "description": "Which Service?",
+        "include": "services/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
         "keyRemember": "selectedService"
       }
     },
@@ -128,10 +138,20 @@
       "type": "command",
       "command": "extension.commandvariable.file.pickFile",
       "args": {
-        "description": "Which directory?",
-        "include": "images/*/*",
-        "transform": { "text": "${fileBasename}" },
-        "showDirs": true,
+        "description": "Which Image?",
+        "include": "images/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
         "keyRemember": "selectedImage"
       }
     },
