@@ -353,3 +353,9 @@ function fn_parse_arguments() {
         fi
     done
 }
+
+function fn_get_all_resource_names_in_directory() {
+    local resource_directory=$1
+    local resource_names=($(basename -a $(ls -1 $resource_directory/*.config.sh) | sed -e 's/.config.sh$//' | sort -u))
+    echo "${resource_names[@]}"
+}
