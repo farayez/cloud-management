@@ -9,7 +9,13 @@
       "command": "npm",
       "args": ["run", "resource:init"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Resource"
       }
     },
     {
@@ -18,7 +24,13 @@
       "command": "npm",
       "args": ["run", "image:push", "${input:image}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Image"
       }
     },
     {
@@ -27,7 +39,13 @@
       "command": "npm",
       "args": ["run", "ecs:start_service", "${input:service}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
       }
     },
     {
@@ -36,7 +54,13 @@
       "command": "npm",
       "args": ["run", "ecs:stop_service", "${input:service}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
       }
     },
     {
@@ -45,7 +69,13 @@
       "command": "npm",
       "args": ["run", "ecs:redeploy_service", "${input:service}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
       }
     },
     {
@@ -56,9 +86,11 @@
       "presentation": {
         "reveal": "always",
         "focus": true,
-        "panel": "new",
+        "panel": "shared",
         "showReuseMessage": false,
-        "clear": false
+        "clear": false,
+        "echo": false,
+        "group": "Task"
       }
     },
     {
@@ -70,7 +102,13 @@
         "task_definition_revision=${input:taskDefinitionRevision}"
       ],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
       }
     },
     {
