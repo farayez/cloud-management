@@ -4,10 +4,10 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Initialize Service",
+      "label": "Initialize Resource",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "service:init"],
+      "args": ["run", "resource:init"],
       "presentation": {
         "showReuseMessage": false
       }

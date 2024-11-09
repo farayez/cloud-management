@@ -1,7 +1,6 @@
 {
   "name": "cloud-management",
   "scripts": {
-    "service:init": "./utils/initialize_service.sh",
     "resource:init": "./utils/initialize_resource.sh",
     "service:clear_history": "./scripts/clear_history.sh",
     "image:push": "./scripts/push_image.sh",
