@@ -356,6 +356,12 @@ function fn_parse_arguments() {
 
 function fn_get_all_resource_names_in_directory() {
     local resource_directory=$1
-    local resource_names=($(basename -a $(ls -1 $resource_directory/*.config.sh) | sed -e 's/.config.sh$//' | sort -u))
+    local files=($(ls -1 $resource_directory/*.config.sh 2>/dev/null))
+
+    if [ -z "$files" ]; then
+        return
+    fi
+
+    local resource_names=($(basename -a ${files[@]} | sed -e 's/.config.sh$//' | sort -u))
     echo "${resource_names[@]}"
 }
