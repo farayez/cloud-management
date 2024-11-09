@@ -269,9 +269,9 @@ function fn_choose_from_menu() {
         index=0
         for o in "${options[@]}"; do
             if [ "$index" == "$cur" ]; then
-                echo -e " >\e[7m$o\e[0m" # mark & highlight the current option
+                echo -e "\u25BA \e[7m$o\e[0m" # mark & highlight the current option
             else
-                echo "  $o"
+                echo -e "  $o"
             fi
             index=$(($index + 1))
         done
