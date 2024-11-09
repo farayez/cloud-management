@@ -74,21 +74,33 @@
       }
     },
     {
-      "label": "Pull Env",
+      "label": "Pull Parameter",
       "type": "shell",
-      "command": "./pull-env.sh",
-      "args": ["${input:service}"],
+      "command": "npm",
+      "args": ["run", "ssm_parameter:pull", "${input:ssm-parameter}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
       }
     },
     {
-      "label": "Push Env",
+      "label": "Push Parameter",
       "type": "shell",
-      "command": "./push-env.sh",
-      "args": ["${input:service}"],
+      "command": "npm",
+      "args": ["run", "ssm_parameter:push", "${input:ssm-parameter}"],
       "presentation": {
-        "showReuseMessage": false
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
       }
     },
     {
@@ -153,6 +165,28 @@
         "display": "transform",
         "showDirs": false,
         "keyRemember": "selectedImage"
+      }
+    },
+    {
+      "id": "ssm-parameter",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Parametr?",
+        "include": "ssm_parameters/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedParameter"
       }
     },
     {
