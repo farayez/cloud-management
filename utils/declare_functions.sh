@@ -76,7 +76,7 @@ fn_demo_colors() {
 
 # Echo alternatives
 fn_info() {
-    echo -e "$CONSOLE_COLOR_BLUE$@$CONSOLE_COLOR_DEFAULT"
+    echo -e "$CONSOLE_COLOR_BLUE  $@$CONSOLE_COLOR_DEFAULT"
 }
 fn_error() {
     echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT" >&2
@@ -97,7 +97,9 @@ fn_status() {
     echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
 }
 fn_success() {
+    fn_draw_separator
     echo -e "\n${CONSOLE_COLOR_LIGHT_GREEN}SUCCESS: $CONSOLE_COLOR_GREEN${@^^}$CONSOLE_COLOR_DEFAULT\n"
+    exit 0
 }
 
 # Ask for user input
@@ -109,6 +111,7 @@ fn_input_text() {
 
 # Fatal Error
 fn_fatal() {
+    fn_draw_separator
     if [ "$#" -lt 1 ]; then
         echo -e "\n${CONSOLE_COLOR_RED}EXECUTION FAILED$CONSOLE_COLOR_DEFAULT\n"
     else
@@ -116,6 +119,26 @@ fn_fatal() {
     fi
 
     exit 1
+}
+
+# Execution ended early
+fn_halt() {
+    fn_draw_separator
+    if [ "$#" -lt 1 ]; then
+        echo -e "\n${CONSOLE_COLOR_YELLOW}EXECUTION HALTED$CONSOLE_COLOR_DEFAULT\n"
+    else
+        echo -e "\n$CONSOLE_COLOR_YELLOW${@^^}$CONSOLE_COLOR_DEFAULT\n"
+    fi
+
+    exit 0
+}
+
+fn_draw_separator() {
+    echo -e -n "${CONSOLE_COLOR_PURPLE}"
+    half_terminal_width=$(($(tput cols) * 2 / 3))
+    dashes_to_print=$((70 < half_terminal_width ? 80 : half_terminal_width))
+    printf '%*s\n' "$dashes_to_print" | tr ' ' '-'
+    echo -e -n "${CONSOLE_COLOR_DEFAULT}"
 }
 
 # Declare an associative array to map keys to commands
@@ -289,6 +312,7 @@ function fn_choose_from_menu() {
     done
     # export the selection to the requested output variable
     printf -v $outvar "${options[$cur]}"
+    echo ""
 }
 
 function fn_populate_and_validate_resource_tag_from_current_script_name() {

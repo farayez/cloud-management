@@ -16,3 +16,5 @@ root_directory=$(pwd)
 
 # Configure console
 fn_define_console_colors
+
+fn_draw_separator

@@ -17,8 +17,7 @@ if [ -z "$running_tasks" ]; then
 fi
 
 # Let user select the task to exec into
-. $root_directory/utils/selection_menu.sh
-fn_choose_from_menu "Select running task:" selected_task "${running_tasks[@]}"
+fn_choose_from_menu "\nSelect running task:" selected_task "${running_tasks[@]}"
 fn_info "Selected task: $selected_task"
 
 # Exec into container
