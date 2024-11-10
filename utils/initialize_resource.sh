@@ -43,32 +43,6 @@ fn_create_resource_config_from_user_input() {
     fn_info "Config generated in $resource_directory/$resource_name.config.sh"
 }
 
-fn_create_resource_directory_from_user_input() {
-    # First parameter is the resource tag
-    # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service"
-    resource_tag=$1
-
-    # Validate resource_tag
-    if [ -z "$resource_tag" ]; then
-        fn_error "resource_tag must be provided"
-        fn_fatal
-    fi
-
-    fn_populate_and_validate_resource_directory_from_resource_tag
-
-    # Get user input for name of resource
-    fn_request_mandatory_input "$resource_tag name" resource_name
-
-    # Create resource directory
-    if [ -d "$resource_directory/$resource_name" ]; then
-        fn_error "$resource_name $resource_tag already exists"
-        fn_fatal
-    fi
-    mkdir -p $resource_directory/$resource_name || fn_fatal
-
-    fn_info "$resource_directory/$resource_name directory created"
-}
-
 fn_copy_config_template() {
     cp templates/$selected_resource.config.sh $resource_directory/$resource_name/config.sh || fn_fatal
     fn_info "Config template generated"
