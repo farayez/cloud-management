@@ -147,16 +147,20 @@ declare -A command_map=(
     ["list-buckets"]="aws s3 ls"
     ["codedeploy-deploy"]="aws deploy create-deployment,--echo-response"
     ["ecs-list-tasks"]="aws ecs list-tasks,--echo-response"
-    ["ecs-exec-command"]="aws ecs execute-command,--log-response"
+    ["ecs-exec-command"]="aws ecs execute-command,--disable-response-log"
     ["ssm-get-parameter"]="aws ssm get-parameter"
     ["ssm-put-parameter"]="aws ssm put-parameter"
+    ["docker-build"]="docker build"
+    ["docker-tag"]="docker tag"
+    ["docker-push"]="docker push,--disable-response-log,--echo-response"
+    ["git"]="git"
 )
 
 # Function to run a command and handle success/error outputs
 fn_run() {
     # Initialize variables provided as arguments
     local echo_response=false
-    local log_response=false
+    local disable_response_log=false
 
     local key="$1" # First parameter is the command key
     shift          # Shift to access remaining parameters as command arguments
@@ -200,8 +204,13 @@ fn_run() {
     echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"
 
     # Run the command without capturing output or error
-    if $log_response; then
-        $cmd "$@" 2>&1
+    if $disable_response_log; then
+        # output=$({ $cmd "$@"; } 2>&1 | tee /dev/tty)
+        output=$($cmd "$@" 2>&1)
+        if $echo_response; then
+            # Print the output. Can be captured in the parent script
+            echo "$output"
+        fi
         echo "---------- SUCCESS" >>"$history_file"
         return 0
     fi

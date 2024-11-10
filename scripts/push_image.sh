@@ -19,16 +19,15 @@ fn_validate_variables image_url image_tag
 
 # Update codebase
 fn_section_start "Repo update"
-cd $root_directory/repos/$repo || exit 1
-git fetch -a || exit 1
-git checkout $branch || exit 1
-git pull || exit 1
+fn_run git -C $root_directory/repos/$repo fetch -a || fn_fatal
+fn_run git -C $root_directory/repos/$repo checkout $branch || fn_fatal
+fn_run git -C $root_directory/repos/$repo pull || fn_fatal
 
 # Build, tag and push image
 fn_section_start "Build and push image"
-docker build -t $image_name . || exit 1
-aws ecr get-login-password --region $aws_region | docker login --username AWS --password-stdin $ecr_url || exit 1
-docker tag $image_name:latest $image_url:$image_tag || exit 1
-docker push $image_url:$image_tag
+fn_run docker-build -t $image_name $root_directory/repos/$repo || fn_fatal
+aws ecr get-login-password --region $aws_region | docker login --username AWS --password-stdin $ecr_url || fn_fatal
+fn_run docker-tag $image_name:latest $image_url:$image_tag || fn_fatal
+fn_run docker-push $image_url:$image_tag
 
 fn_success "Image Pushed to ECR"
