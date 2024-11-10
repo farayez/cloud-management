@@ -52,7 +52,12 @@ fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resou
 
 case $selected_resource in
 "repo")
-    fn_fatal "$selected_resource initialization not available yet"
+    # fn_fatal "$selected_resource initialization not available yet"
+    fn_request_mandatory_input "Git repository URL" git_url
+
+    resource_tag=$selected_resource
+    fn_populate_and_validate_resource_directory_from_resource_tag
+    git -C $resource_directory clone $git_url || fn_fatal
     ;;
 "image")
     fn_create_resource_config_from_user_input $selected_resource
