@@ -17,6 +17,12 @@ root_directory=$(pwd)
 # Declare input functions
 . ./utils/functions/input.sh
 
+# Declare functions required for script execution
+. ./utils/functions/execution.sh
+
+# Declare functions required for remote command execution
+. ./utils/functions/run_command.sh
+
 # Declare auxiliary functions
 . ./utils/declare_functions.sh
 
