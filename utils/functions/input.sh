@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Ask for user input
 fn_input_text() {
     echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_GREEN"

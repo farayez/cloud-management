@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Echo alternatives
 fn_info() {
     echo -e "$CONSOLE_COLOR_BLUE  $@$CONSOLE_COLOR_DEFAULT"
@@ -52,6 +54,7 @@ fn_halt() {
     exit 0
 }
 
+# Draw separator to visually isolate sections or stages
 fn_draw_separator() {
     echo -e -n "${CONSOLE_COLOR_PURPLE}"
     half_terminal_width=$(($(tput cols) * 2 / 3))
