@@ -44,26 +44,6 @@ fn_list_declared_variables() {
     declared_variables=($(compgen -A variable | grep '^[a-z].*' | grep -v '^npm_*'))
 }
 
-# Setup Console Colors
-fn_define_console_colors() {
-    CONSOLE_COLOR_BLACK='\033[0;30m'
-    CONSOLE_COLOR_RED='\033[0;31m'
-    CONSOLE_COLOR_GREEN='\033[0;32m'
-    CONSOLE_COLOR_BROWN='\033[0;33m'
-    CONSOLE_COLOR_BLUE='\033[0;34m'
-    CONSOLE_COLOR_PURPLE='\033[0;35m'
-    CONSOLE_COLOR_CYAN='\033[0;36m'
-    CONSOLE_COLOR_LIGHT_GRAY='\033[0;37m'
-    CONSOLE_COLOR_DARK_GRAY='\033[1;30m'
-    CONSOLE_COLOR_LIGHT_RED='\033[1;31m'
-    CONSOLE_COLOR_LIGHT_GREEN='\033[1;32m'
-    CONSOLE_COLOR_YELLOW='\033[1;33m'
-    CONSOLE_COLOR_LIGHT_BLUE='\033[1;34m'
-    CONSOLE_COLOR_LIGHT_PURPLE='\033[1;35m'
-    CONSOLE_COLOR_LIGHT_CYAN='\033[1;36m'
-    CONSOLE_COLOR_WHITE='\033[1;37m'
-    CONSOLE_COLOR_DEFAULT='\033[0m'
-}
 fn_demo_colors() {
     declared_colors=($(compgen -A variable | grep '^CONSOLE_COLOR_*'))
 
@@ -73,88 +53,6 @@ fn_demo_colors() {
 
     unset declared_colors
 }
-
-# Echo alternatives
-fn_info() {
-    echo -e "$CONSOLE_COLOR_BLUE  $@$CONSOLE_COLOR_DEFAULT"
-}
-fn_error() {
-    echo -e "$CONSOLE_COLOR_RED  ERROR: $@$CONSOLE_COLOR_DEFAULT" >&2
-}
-fn_debug() {
-    echo -e "$CONSOLE_COLOR_BLACK$@$CONSOLE_COLOR_DEFAULT"
-}
-fn_warning() {
-    echo -e "$CONSOLE_COLOR_YELLOW$@$CONSOLE_COLOR_DEFAULT"
-}
-fn_section_start() {
-    echo -e "\n$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
-}
-fn_section_end() {
-    echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT\n"
-}
-fn_status() {
-    echo -e "$CONSOLE_COLOR_PURPLE${@^^}$CONSOLE_COLOR_DEFAULT"
-}
-fn_success() {
-    fn_draw_separator
-    echo -e "\n${CONSOLE_COLOR_LIGHT_GREEN}SUCCESS: $CONSOLE_COLOR_GREEN${@^^}$CONSOLE_COLOR_DEFAULT\n"
-    exit 0
-}
-
-# Ask for user input
-fn_input_text() {
-    echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_GREEN"
-    read $2
-    echo -e "$CONSOLE_COLOR_DEFAULT"
-}
-
-# Fatal Error
-fn_fatal() {
-    fn_draw_separator
-    if [ "$#" -lt 1 ]; then
-        echo -e "\n${CONSOLE_COLOR_RED}EXECUTION FAILED$CONSOLE_COLOR_DEFAULT\n"
-    else
-        echo -e "\n$CONSOLE_COLOR_RED${1^^}$CONSOLE_COLOR_DEFAULT\n"
-    fi
-
-    exit 1
-}
-
-# Execution ended early
-fn_halt() {
-    fn_draw_separator
-    if [ "$#" -lt 1 ]; then
-        echo -e "\n${CONSOLE_COLOR_YELLOW}EXECUTION HALTED$CONSOLE_COLOR_DEFAULT\n"
-    else
-        echo -e "\n$CONSOLE_COLOR_YELLOW${@^^}$CONSOLE_COLOR_DEFAULT\n"
-    fi
-
-    exit 0
-}
-
-fn_draw_separator() {
-    echo -e -n "${CONSOLE_COLOR_PURPLE}"
-    half_terminal_width=$(($(tput cols) * 2 / 3))
-    dashes_to_print=$((70 < half_terminal_width ? 80 : half_terminal_width))
-    printf '%*s\n' "$dashes_to_print" | tr ' ' '-'
-    echo -e -n "${CONSOLE_COLOR_DEFAULT}"
-}
-
-# Declare an associative array to map keys to commands
-declare -A command_map=(
-    ["update-service"]="aws ecs update-service"
-    ["list-buckets"]="aws s3 ls"
-    ["codedeploy-deploy"]="aws deploy create-deployment,--echo-response"
-    ["ecs-list-tasks"]="aws ecs list-tasks,--echo-response"
-    ["ecs-exec-command"]="aws ecs execute-command,--disable-response-log"
-    ["ssm-get-parameter"]="aws ssm get-parameter"
-    ["ssm-put-parameter"]="aws ssm put-parameter"
-    ["docker-build"]="docker build"
-    ["docker-tag"]="docker tag"
-    ["docker-push"]="docker push,--disable-response-log,--echo-response"
-    ["git"]="git"
-)
 
 # Function to run a command and handle success/error outputs
 fn_run() {
@@ -287,41 +185,6 @@ fn_get_codedeploy_revision_json() {
 
     # Print the final single-line JSON
     echo "$revision_json" | jq -c '.'
-}
-
-function fn_choose_from_menu() {
-    local prompt="$1" outvar="$2"
-    shift
-    shift
-    local options=("$@") cur=0 count=${#options[@]} index=0
-    local esc=$(echo -en "\e") # cache ESC as test doesn't allow esc codes
-    printf "$prompt\n"
-    while true; do
-        # list all options (option list is zero-based)
-        index=0
-        for o in "${options[@]}"; do
-            if [ "$index" == "$cur" ]; then
-                echo -e "\u25BA \e[7m$o\e[0m" # mark & highlight the current option
-            else
-                echo -e "  $o"
-            fi
-            index=$(($index + 1))
-        done
-        read -s -n3 key                # wait for user to key in arrows or ENTER
-        if [[ $key == $'\e[A' ]]; then # up arrow
-            cur=$(($cur - 1))
-            [ "$cur" -lt 0 ] && cur=0
-        elif [[ $key == $'\e[B' ]]; then # down arrow
-            cur=$(($cur + 1))
-            [ "$cur" -ge $count ] && cur=$(($count - 1))
-        elif [[ $key == "" ]]; then # nothing, i.e the read delimiter - ENTER
-            break
-        fi
-        echo -en "\e[${count}A" # go up to the beginning to re-render
-    done
-    # export the selection to the requested output variable
-    printf -v $outvar "${options[$cur]}"
-    echo ""
 }
 
 function fn_populate_and_validate_resource_tag_from_current_script_name() {

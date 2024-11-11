@@ -11,10 +11,13 @@ root_directory=$(pwd)
 # Define constants
 . ./utils/define_constants.sh
 
-# Declare functions
-. ./utils/declare_functions.sh
+# Declare output functions
+. ./utils/functions/output.sh
 
-# Configure console
-fn_define_console_colors
+# Declare input functions
+. ./utils/functions/input.sh
+
+# Declare auxiliary functions
+. ./utils/declare_functions.sh
 
 fn_draw_separator
