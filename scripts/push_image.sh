@@ -2,7 +2,18 @@
 
 . ./utils/pre_execution.sh
 
-fn_validate_variables root_directory repo branch aws_region ecr_url image_name
+fn_validate_variables root_directory repo aws_region ecr_url image_name
+
+# Prepare branch name when not provided in config
+if [ ! -v branch ]; then
+    if [ -v branch_options ]; then
+        fn_choose_from_menu "Select branch: " branch $branch_options
+    else
+        fn_input_text "Enter branch: " branch
+    fi
+fi
+
+fn_validate_variables branch
 
 # Prepare image url
 if [ ! -v image_url ]; then

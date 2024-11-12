@@ -7,6 +7,7 @@ aws_profile=
 # -- Repository
 repo=
 branch=
+# branch_options="master staging"
 
 # -- ECR
 ecr_url=
