@@ -29,7 +29,7 @@ function fn_validate_variables() {
         fn_fatal "Config validation failed"
     fi
 
-    fn_info "\nCONFIG VALIDATION SUCCESSFUL"
+    # fn_info "\nCONFIG VALIDATION SUCCESSFUL"
 }
 
 function fn_populate_and_validate_resource_tag_from_current_script_name() {
