@@ -5,8 +5,7 @@
 # The available command keys are defined in command_map in `utils/define_constants.sh`
 fn_run() {
     # Initialize variables provided as arguments
-    local echo_response=false
-    local disable_response_log=false
+    local unbuffered_echo=false
 
     local key="$1" # First parameter is the command key
     shift          # Shift to access remaining parameters as command arguments
@@ -44,46 +43,41 @@ fn_run() {
         return 1
     }
 
+    # Write the command information to the history file
     local history_file="$history_directory/${current_execution_id}.${current_script_name}.history"
     touch "$history_file"
     echo -e "---------- START\nTIMESTAMP: ${timestamp}" >>"$history_file"
     echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"
+    echo -e "---------- OUTPUT FORMAT\nunbuffered_echo: $unbuffered_echo" >>"$history_file"
+    echo -e "---------- OUTPUT\n" >>"$history_file"
 
-    # Run the command without capturing output or error
-    if $disable_response_log; then
-        # output=$({ $cmd "$@"; } 2>&1 | tee /dev/tty)
-        output=$($cmd "$@" 2>&1)
-        if $echo_response; then
-            # Print the output. Can be captured in the parent script
-            echo "$output"
-        fi
-        echo "---------- SUCCESS" >>"$history_file"
-        return 0
-    fi
+    # Create a temporary file to store the exit code
+    local exit_code_file
+    exit_code_file=$(mktemp)
 
-    # Run the command and capture output or error
-    if output=$($cmd "$@" 2>&1); then
-        # Command succeeded
-        # echo "Success: $output"
-
-        # Save the result to a history file
-        echo "---------- SUCCESS" >>"$history_file"
-        echo "$output" >>"$history_file"
-
-        if $echo_response; then
-            # Print the output. Can be captured in the parent script
-            echo "$output"
-        fi
-        return 0
+    # Run the command
+    if $unbuffered_echo; then
+        # Unbuffered output. Contains all the original formatting
+        # Echo output and log it to the history file
+        script -q -c "$cmd $*; echo -n \$? > $exit_code_file" /dev/null | tee -a "$history_file"
     else
-        # Command failed
-        fn_error "$output"
-
-        # Save the error to a history file
-        echo "---------- ERROR" >>"$history_file"
-        echo "$output" >>"$history_file"
-        return 1
+        # Buffered output. Strips all the original formatting
+        # Echo output and log it to the history file
+        {
+            stdbuf -oL -eL bash -c "$cmd $*" 2>&1
+            echo $? >"$exit_code_file"
+        } | tee -a "$history_file"
     fi
+
+    # Read the exit code from the temporary file
+    local exit_code
+    exit_code=$(cat $exit_code_file)
+    rm -f $exit_code_file
+
+    # Write the exit code to the history file
+    echo -e "---------- EXIT STATUS\n$exit_code" >>"$history_file"
+
+    return $exit_code
 }
 
 # Get CodeDeploy revision config
