@@ -46,10 +46,9 @@ fn_run() {
     # Write the command information to the history file
     local history_file="$history_directory/${current_execution_id}.${current_script_name}.history"
     touch "$history_file"
-    echo -e "---------- START\nTIMESTAMP: ${timestamp}" >>"$history_file"
+    echo -e "========== START\nTIMESTAMP: ${timestamp}\nUNBUFFERED ECHO: $unbuffered_echo" >>"$history_file"
     echo -e "---------- COMMAND\n$cmd" "$@" >>"$history_file"
-    echo -e "---------- OUTPUT FORMAT\nunbuffered_echo: $unbuffered_echo" >>"$history_file"
-    echo -e "---------- OUTPUT\n" >>"$history_file"
+    echo -e "---------- OUTPUT" >>"$history_file"
 
     # Create a temporary file to store the exit code
     local exit_code_file
@@ -83,7 +82,7 @@ fn_run() {
     rm -f $exit_code_file
 
     # Write the exit code to the history file
-    echo -e "---------- EXIT STATUS\n$exit_code" >>"$history_file"
+    echo -e "---------- EXIT STATUS: $exit_code\n" >>"$history_file"
 
     return $exit_code
 }
