@@ -6,12 +6,12 @@ if [[ -n "$codedeploy_application_name" ]]; then
     fn_info "Forcing deployment using CodeDeploy"
     fn_validate_variables ecs_cluster ecs_service aws_region timestamp task_definition primary_container_name primary_container_port codedeploy_application_name codedeploy_group_name
 
-    fn_section_start "Updating Service"
-    fn_run update-service \
-        --cluster $ecs_cluster \
-        --service $ecs_service \
-        --region $aws_region \
-        --enable-execute-command
+    # fn_section_start "Updating Service"
+    # fn_run update-service \
+    #     --cluster $ecs_cluster \
+    #     --service $ecs_service \
+    #     --region $aws_region \
+    #     --enable-execute-command
     # --desired-count 6 \
 
     fn_section_start "Retrieving task definition ARN"

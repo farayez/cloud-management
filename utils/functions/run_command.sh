@@ -61,10 +61,18 @@ fn_run() {
         # Echo output and log it to the history file
         script -q -c "$cmd $*; echo -n \$? > $exit_code_file" /dev/null | tee -a "$history_file"
     else
+        # Use printf to properly escape and quote each parameter
+        params=("$@")
+        quoted_params=$(printf "'%s' " "${params[@]}")
+
+        # View the command to be run
+        # stdbuf -oL -eL echo "$cmd $quoted_params"
+        # echo ""
+
         # Buffered output. Strips all the original formatting
         # Echo output and log it to the history file
         {
-            stdbuf -oL -eL bash -c "$cmd $*" 2>&1
+            stdbuf -oL -eL bash -c "$cmd $quoted_params" 2>&1
             echo $? >"$exit_code_file"
         } | tee -a "$history_file"
     fi
