@@ -4,8 +4,12 @@
 
 fn_validate_variables resource_name root_directory aws_region
 
-task_definition_file=$root_directory/task_definitions/definitions/$resource_name.pushable.json
+# Prepare task definition file if empty
+if [ -z "$task_definition_file" ]; then
+    task_definition_file=$root_directory/task_definitions/definitions/$resource_name.pushable.json
+fi
 
+# Ensure task definition file exists
 if [ ! -f "$task_definition_file" ]; then
     fn_error "Task Definition file $task_definition_file does not exist"
     fn_fatal
