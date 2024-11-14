@@ -57,6 +57,10 @@ function fn_populate_and_validate_resource_directory_from_resource_tag() {
     # Create resource directory if it doesn't exist
     if [ ! -d $resource_directory ]; then
         mkdir -p $resource_directory || fn_fatal
+    fi
+
+    # Copy .gitignore if it doesn't exist
+    if [ ! -f $resource_directory/.gitignore ]; then
         cp templates/resource.gitignore.template $resource_directory/.gitignore || fn_fatal
     fi
 }
