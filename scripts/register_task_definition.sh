@@ -15,6 +15,6 @@ fn_info "Using task definition file: $task_definition_file"
 
 fn_run register-task-definition \
     --region $aws_region \
-    --cli-input-json file://$task_definition_file
+    --cli-input-json file://$task_definition_file || fn_fatal "Registration Failed"
 
 fn_success "Task Definition Registered"
