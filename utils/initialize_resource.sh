@@ -71,6 +71,9 @@ case $selected_resource in
 "service")
     fn_create_resource_config_from_user_input $selected_resource
     ;;
+"task-definition")
+    fn_create_resource_config_from_user_input $selected_resource
+    ;;
 *)
     fn_fatal "invalid selection"
     ;;
