@@ -9,6 +9,8 @@
     "ecs:start_service": "./scripts/start-service.sh",
     "ecs:exec_container": "./scripts/exec_container.sh",
     "ssm_parameter:pull": "./scripts/pull_ssm_parameter.sh",
-    "ssm_parameter:push": "./scripts/push_ssm_parameter.sh"
+    "ssm_parameter:push": "./scripts/push_ssm_parameter.sh",
+    "task_definition:validate": "./scripts/validate_task_definition.sh",
+    "task_definition:register": "./scripts/register_task_definition.sh"
   }
 }

@@ -6,6 +6,7 @@ declare -A resource_tag_to_directory_map=(
     ["ssm-parameter"]="ssm_parameters"
     ["secret"]="secrets"
     ["service"]="services"
+    ["task-definition"]="task_definitions"
 )
 
 declare -A script_name_to_resource_tag_map=(
@@ -14,6 +15,8 @@ declare -A script_name_to_resource_tag_map=(
     ["exec_container"]="service"
     ["pull_ssm_parameter"]="ssm-parameter"
     ["push_ssm_parameter"]="ssm-parameter"
+    ["register_task_definition"]="task-definition"
+    ["validate_task_definition"]="task-definition"
 )
 
 declare -A script_name_to_parameter_map=(
@@ -34,6 +37,7 @@ declare -A command_map=(
     ["docker-build"]="docker build,--unbuffered-echo"
     ["docker-tag"]="docker tag"
     ["docker-push"]="docker push,--unbuffered-echo"
+    ["register-task-definition"]="aws ecs register-task-definition"
     ["git"]="git"
 )
 
