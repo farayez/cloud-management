@@ -21,6 +21,6 @@ fn_run register-task-definition \
     --region $aws_region \
     --cli-input-json file://$task_definition_file \
     --generate-cli-skeleton \
-    output || fn_fatal "Validation Failed"
+    output || fn_fatal "Validation Failed. Please check history for more details."
 
 fn_success "Task Definition validated"

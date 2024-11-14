@@ -25,7 +25,7 @@ declare -A script_name_to_parameter_map=(
 
 # Declare an associative array to map command keys to command strings
 # Used in `fn_run` where history is logged/echoed while command runs
-# Supported parameters: --buffered-echo, --unbuffered-echo
+# Supported parameters: --buffered-echo, --unbuffered-echo, --no-echo
 declare -A command_map=(
     ["update-service"]="aws ecs update-service"
     ["list-buckets"]="aws s3 ls"
@@ -37,7 +37,7 @@ declare -A command_map=(
     ["docker-build"]="docker build,--unbuffered-echo"
     ["docker-tag"]="docker tag"
     ["docker-push"]="docker push,--unbuffered-echo"
-    ["register-task-definition"]="aws ecs register-task-definition"
+    ["register-task-definition"]="aws ecs register-task-definition,--no-echo"
     ["git"]="git"
 )
 

@@ -6,6 +6,7 @@
 fn_run() {
     # Initialize variables provided as arguments
     local unbuffered_echo=false
+    local no_echo=false
 
     local key="$1" # First parameter is the command key
     shift          # Shift to access remaining parameters as command arguments
@@ -68,12 +69,20 @@ fn_run() {
         # stdbuf -oL -eL echo "$cmd $quoted_params"
         # echo ""
 
-        # Buffered output. Strips all the original formatting
-        # Echo output and log it to the history file
-        {
-            stdbuf -oL -eL bash -c "$cmd $quoted_params" 2>&1
+        if $no_echo; then
+            # No output. Runs the command silently.
+            # Only log output to the history file
+            output=$($cmd "$@" 2>&1)
             echo $? >"$exit_code_file"
-        } | tee -a "$history_file"
+            echo "$output" >>"$history_file"
+        else
+            # Buffered output. Strips all the original formatting
+            # Echo output and log it to the history file
+            {
+                stdbuf -oL -eL bash -c "$cmd $quoted_params" 2>&1
+                echo $? >"$exit_code_file"
+            } | tee -a "$history_file"
+        fi
     fi
 
     # Read the exit code from the temporary file
