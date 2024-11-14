@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Initialize execution
-
 . ./utils/initialize_execution.sh
 
 fn_request_mandatory_input() {
@@ -36,16 +35,9 @@ fn_create_resource_config_from_user_input() {
         fn_error "$resource_name $resource_tag already exists"
         fn_fatal
     fi
-    echo "$resource_directory/$resource_name.config.sh"
-
     cp templates/$resource_tag.config.sh $resource_directory/$resource_name.config.sh || fn_fatal
 
     fn_info "Config generated in $resource_directory/$resource_name.config.sh"
-}
-
-fn_copy_config_template() {
-    cp templates/$selected_resource.config.sh $resource_directory/$resource_name/config.sh || fn_fatal
-    fn_info "Config template generated"
 }
 
 fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
