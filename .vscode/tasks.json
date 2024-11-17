@@ -142,6 +142,36 @@
       }
     },
     {
+      "label": "Validate Task Definition",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "task_definition:validate", "${input:task-definition}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task Definition"
+      }
+    },
+    {
+      "label": "Register Task Definition",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "task_definition:register", "${input:task-definition}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task Definition"
+      }
+    },
+    {
       "label": "Test Integration",
       "type": "shell",
       "command": "./test.sh",
@@ -212,6 +242,28 @@
       "args": {
         "description": "Which Parametr?",
         "include": "ssm_parameters/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedParameter"
+      }
+    },
+    {
+      "id": "task-definition",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Parametr?",
+        "include": "task_definitions/*.config.sh",
         "valueTransform": {
           "text": "${fileBasename}",
           "find": ".config.sh",
