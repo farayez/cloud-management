@@ -27,7 +27,7 @@ declare -A script_name_to_parameter_map=(
 # Used in `fn_run` where history is logged/echoed while command runs
 # Supported parameters: --buffered-echo, --unbuffered-echo, --no-echo
 declare -A command_map=(
-    ["update-service"]="aws ecs update-service"
+    ["update-service"]="aws ecs update-service,--no-echo"
     ["list-buckets"]="aws s3 ls"
     ["codedeploy-deploy"]="aws deploy create-deployment"
     ["ecs-list-tasks"]="aws ecs list-tasks"

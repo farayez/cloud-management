@@ -14,7 +14,7 @@ if [[ -n "$codedeploy_application_name" ]]; then
     #     --enable-execute-command
     # --desired-count 6 \
 
-    fn_section_start "Retrieving task definition ARN"
+    fn_section_start "Retrieving latest task definition ARN"
     task_definition_latest_arn=$(aws ecs describe-task-definition \
         --region $aws_region \
         --task-definition $task_definition \
@@ -37,11 +37,19 @@ else
     fn_info "Forcing deployment using ECS"
     fn_validate_variables ecs_cluster ecs_service aws_region timestamp
 
+    # fn_section_start "Retrieving latest task definition ARN"
+    # task_definition_latest_arn=$(aws ecs describe-task-definition \
+    #     --region $aws_region \
+    #     --task-definition $task_definition \
+    #     --query 'taskDefinition.taskDefinitionArn' \
+    #     --output text)
+
     fn_run update-service \
         --cluster $ecs_cluster \
         --service $ecs_service \
         --region $aws_region \
         --enable-execute-command \
+        --task-definition $task_definition \
         --force-new-deployment || fn_fatal
 fi
 
