@@ -19,6 +19,21 @@
       }
     },
     {
+      "label": "Clear Resource History",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "resource:clear_history"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Resource"
+      }
+    },
+    {
       "label": "Push Image",
       "type": "shell",
       "command": "npm",
