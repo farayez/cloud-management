@@ -57,8 +57,8 @@ fn_halt() {
 # Draw separator to visually isolate sections or stages
 fn_draw_separator() {
     echo -e -n "${CONSOLE_COLOR_PURPLE}"
-    half_terminal_width=$(($(tput cols) * 2 / 3))
-    dashes_to_print=$((70 < half_terminal_width ? 80 : half_terminal_width))
+    local half_terminal_width=$(($(tput cols) * 2 / 3))
+    local dashes_to_print=$((70 < half_terminal_width ? 80 : half_terminal_width))
     printf '%*s\n' "$dashes_to_print" | tr ' ' '-'
     echo -e -n "${CONSOLE_COLOR_DEFAULT}"
 }
