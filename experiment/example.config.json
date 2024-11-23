@@ -1,0 +1,18 @@
+{
+  "config": {
+    "aws_profile": "test",
+    "config2": "value2"
+  },
+  "services": [
+    {
+      "name": "service-1",
+      "config": {
+        "aws_region": "us-east-1",
+        "ecs_cluster": "cluster-1",
+        "ecs_service": "service-1",
+        "task_definition": "service-1",
+        "primary_container_name": "app"
+      }
+    }
+  ]
+}
