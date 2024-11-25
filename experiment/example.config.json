@@ -1,7 +1,8 @@
 {
   "config": {
     "aws_profile": "test",
-    "config2": "value2"
+    "config2": "value2",
+    "aws_region": "default"
   },
   "services": [
     {
@@ -11,7 +12,23 @@
         "ecs_cluster": "cluster-1",
         "ecs_service": "service-1",
         "task_definition": "service-1",
-        "primary_container_name": "app"
+        "primary_container_name": "app",
+        "codedeploy_application_name": {},
+        "codedeploy_group_name": {},
+        "primary_container_port": {}
+      }
+    },
+    {
+      "name": "service-2",
+      "config": {
+        "aws_region": "us-east-2",
+        "ecs_cluster": "cluster-2",
+        "ecs_service": "service-2",
+        "task_definition": "service-2",
+        "primary_container_name": "app",
+        "codedeploy_application_name": {},
+        "codedeploy_group_name": {},
+        "primary_container_port": {}
       }
     }
   ]
