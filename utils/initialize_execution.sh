@@ -23,6 +23,9 @@ root_directory=$(pwd)
 # Declare functions required for remote command execution
 . ./utils/functions/run_command.sh
 
+# Declare functions required for parsing config files
+. ./utils/functions/parse_config.sh
+
 # Declare auxiliary functions
 . ./utils/declare_functions.sh
 
