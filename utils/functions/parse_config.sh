@@ -2,7 +2,7 @@
 
 function fn_populate_config_variables() {
     # Fetch json config for provided stack
-    local config_file_content=$(echo "$(<$root_directory/experiment/example.config.json)")
+    local config_file_content=$(echo "$(<$root_directory/example.config.json)")
 
     # Populate stack level config variables
     fn_populate_config_variables_from_json "$config_file_content"
@@ -20,7 +20,7 @@ function fn_populate_config_variables_from_json() {
 
 function fn_get_variable_export_strings_from_json() {
     # Get .config object > get keys value pairs > filter out null values > prepare for export
-    echo $@ | jq -r '.config | to_entries | .[] | select(.value != null and .value != {}) | "conf_" + .key + "=" + "\"" + (.value | tostring) + "\"" '
+    echo $@ | jq -r '.config | to_entries | .[] | select(.value != null and .value != {}) | "" + .key + "=" + "" + (.value | tostring) + "" '
 }
 
 function fn_export_variables() {
