@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./utils/initialize_execution.sh
+. ./utils/prepare_runtime.sh
 
 # Get user input for resource type
 options=("${!resource_tag_to_directory_map[@]}" "\u2606 ALL \u2606")

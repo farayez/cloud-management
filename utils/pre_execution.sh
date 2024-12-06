@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./utils/initialize_execution.sh
+. ./utils/prepare_runtime.sh
 
 # Populate execution variables
 fn_populate_and_validate_resource_tag_from_current_script_name

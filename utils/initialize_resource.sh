@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Initialize execution
-. ./utils/initialize_execution.sh
+. ./utils/prepare_runtime.sh
 
 fn_request_mandatory_input() {
     local input_name=${1:-parameter}
