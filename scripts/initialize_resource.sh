@@ -3,13 +3,13 @@
 # Initialize execution
 . ./utils/prepare_runtime.sh
 
-fn_request_mandatory_input() {
-    local input_name=${1:-parameter}
+fn_request_mandatory_text_input() {
     local input_variable_name=${2:-user_input}
-    fn_input_text "Enter $input_name for initializtion: " $input_variable_name
+    local prompt=${1:-"Enter the value for $input_variable_name"}
+    fn_input_text "$prompt" $input_variable_name
 
     if [ -z "${!input_variable_name}" ]; then
-        fn_error "$input_name must be provided for initializtion"
+        fn_error "Input must be provided to continue execution"
         fn_fatal
     fi
 }
@@ -49,7 +49,7 @@ fn_create_resource_config_from_user_input() {
     fi
 
     # Get user input for name of resource
-    # fn_request_mandatory_input "$resource_tag name" resource_name
+    fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
 
     # Create resource already exists in config file
 
@@ -63,7 +63,7 @@ fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resou
 case $selected_resource in
 "repo")
     # fn_fatal "$selected_resource initialization not available yet"
-    fn_request_mandatory_input "Git repository URL" git_url
+    fn_request_mandatory_text_input "Enter Git repository URL for initializtion: " git_url
 
     resource_tag=$selected_resource
     fn_populate_and_validate_resource_directory_from_resource_tag
