@@ -1,0 +1,18 @@
+{
+  "common": {
+    "aws_profile": "test",
+    "aws_region": "eu-west-1"
+  },
+  "service": {
+    "ecs_cluster": "",
+    "ecs_service": "",
+    "task_definition": "",
+    "primary_container_name": "",
+    "codedeploy_application_name": {},
+    "codedeploy_group_name": {},
+    "primary_container_port": {}
+  },
+  "ssm_parameter": {
+    "ssm_param_name": ""
+  }
+}
