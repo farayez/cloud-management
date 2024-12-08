@@ -16,7 +16,7 @@ fn_request_mandatory_input() {
 
 fn_create_resource_config_from_user_input() {
     # First parameter is the resource tag
-    # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service"
+    # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service", "task-definition"
     resource_tag=$1
 
     # Validate resource_tag
@@ -25,19 +25,37 @@ fn_create_resource_config_from_user_input() {
         fn_fatal
     fi
 
-    fn_populate_and_validate_resource_directory_from_resource_tag
+    # Get config template filename
+    local config_templates_file=$root_directory/templates/config_templates.json
 
-    # Get user input for name of resource
-    fn_request_mandatory_input "$resource_tag name" resource_name
-
-    # Create resource config
-    if [ -f "$resource_directory/$resource_name.config.sh" ]; then
-        fn_error "$resource_name $resource_tag already exists"
+    # Validate config template file
+    if [ ! -f $config_templates_file ]; then
+        fn_error "Config template file not found"
         fn_fatal
     fi
-    cp templates/$resource_tag.config.sh $resource_directory/$resource_name.config.sh || fn_fatal
 
-    fn_info "Config generated in $resource_directory/$resource_name.config.sh"
+    # Get active config filename
+    local config_file=configurations/default.config.json
+
+    # Create default config file if it doesn't exist
+    if [ ! -f $config_file ]; then
+        # Create default config file
+        jq '{}' -n >$config_file
+
+        # Add common config to the default config file
+        local common_config
+        common_config=$(jq -e -r '.common' "$config_templates_file") || fn_fatal
+        jq --argjson common_config "$common_config" '.config += $common_config' $config_file -n >$config_file
+    fi
+
+    # Get user input for name of resource
+    # fn_request_mandatory_input "$resource_tag name" resource_name
+
+    # Create resource already exists in config file
+
+    # Add template resource configurations to config file
+
+    fn_info "Config added in $config_file"
 }
 
 fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
