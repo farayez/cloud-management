@@ -3,17 +3,6 @@
 # Initialize execution
 . ./utils/prepare_runtime.sh
 
-fn_request_mandatory_text_input() {
-    local input_variable_name=${2:-user_input}
-    local prompt=${1:-"Enter the value for $input_variable_name"}
-    fn_input_text "$prompt" $input_variable_name
-
-    if [ -z "${!input_variable_name}" ]; then
-        fn_error "Input must be provided to continue execution"
-        fn_fatal
-    fi
-}
-
 fn_create_resource_config_from_user_input() {
     # First parameter is the resource tag
     # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service", "task-definition"
@@ -58,7 +47,8 @@ fn_create_resource_config_from_user_input() {
     fn_info "Config added in $config_file"
 }
 
-fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
+# fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
+selected_resource="image"
 
 case $selected_resource in
 "repo")

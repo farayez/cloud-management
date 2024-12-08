@@ -7,6 +7,17 @@ fn_input_text() {
     echo -e "$CONSOLE_COLOR_DEFAULT"
 }
 
+fn_request_mandatory_text_input() {
+    local input_variable_name=${2:-user_input}
+    local prompt=${1:-"Enter the value for $input_variable_name"}
+    fn_input_text "$prompt" $input_variable_name
+
+    if [ -z "${!input_variable_name}" ]; then
+        fn_error "Input must be provided to continue execution"
+        fn_fatal
+    fi
+}
+
 # Ask for user selection
 function fn_choose_from_menu() {
     local prompt="$1" outvar="$2"
