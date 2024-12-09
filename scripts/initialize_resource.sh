@@ -3,6 +3,15 @@
 # Initialize execution
 . ./utils/prepare_runtime.sh
 
+fn_validate_json() {
+    fn_info "Validating JSON in $1"
+    local t
+    if ! t=$(jq -re . "$1"); then
+        fn_error "Invalid JSON in $1"
+        fn_fatal
+    fi
+}
+
 fn_create_resource_config_from_user_input() {
     # First parameter is the resource tag
     # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service", "task-definition"
@@ -14,6 +23,10 @@ fn_create_resource_config_from_user_input() {
         fn_fatal
     fi
 
+    # Get user input for name of resource
+    # fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
+    resource_name="test"
+
     # Get config template filename
     local config_templates_file=$root_directory/templates/config_templates.json
 
@@ -22,27 +35,40 @@ fn_create_resource_config_from_user_input() {
         fn_error "Config template file not found"
         fn_fatal
     fi
+    fn_validate_json $config_templates_file
+
+    # Gather config templates from config template file
+    local resource_config
+    resource_config=$(jq -e -r ".${resource_tag}" "$config_templates_file") || fn_fatal
+    local common_config
+    common_config=$(jq -e -r '.common' "$config_templates_file") || fn_fatal
 
     # Get active config filename
     local config_file=configurations/default.config.json
 
-    # Create default config file if it doesn't exist
-    if [ ! -f $config_file ]; then
-        # Create default config file
+    # Create default config file if it doesn't exist or is empty
+    if [ ! -f $config_file ] || [ -z "$(cat $config_file)" ]; then
+        fn_info Create default config file
         jq '{}' -n >$config_file
 
-        # Add common config to the default config file
-        local common_config
-        common_config=$(jq -e -r '.common' "$config_templates_file") || fn_fatal
-        jq --argjson common_config "$common_config" '.config += $common_config' $config_file -n >$config_file
+        # Add common config to the default config file if it doesn't exist
+        local tmp
+        tmp=$(jq ".config += $common_config" $config_file) || fn_fatal
+        echo "$tmp" >$config_file
+        fn_info "Default config file created in $config_file"
     fi
 
-    # Get user input for name of resource
-    fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
+    # Validate default config file
+    fn_validate_json $config_file
 
-    # Create resource already exists in config file
+    # Check whether resource already exists in config file
 
     # Add template resource configurations to config file
+    local config_to_add
+    # config_to_add="[{\"name\": \"$resource_name\", \"config\": $resource_config}]"
+    config_to_add="[{\"name\": \"$resource_name\", \"config\": $resource_config}]"
+    tmp=$(jq ".${resource_tag} += ${config_to_add}" $config_file) || fn_fatal
+    echo "$tmp" >$config_file
 
     fn_info "Config added in $config_file"
 }
