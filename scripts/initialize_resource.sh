@@ -3,7 +3,7 @@
 # Initialize execution
 . ./utils/prepare_runtime.sh
 
-fn_validate_json() {
+fn_validate_json_in_file() {
     fn_info "Validating JSON in $1"
     local t
     if ! t=$(jq -re . "$1"); then
@@ -24,8 +24,7 @@ fn_create_resource_config_from_user_input() {
     fi
 
     # Get user input for name of resource
-    # fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
-    resource_name="test"
+    fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
 
     # Get config template filename
     local config_templates_file=$root_directory/templates/config_templates.json
@@ -35,7 +34,7 @@ fn_create_resource_config_from_user_input() {
         fn_error "Config template file not found"
         fn_fatal
     fi
-    fn_validate_json $config_templates_file
+    fn_validate_json_in_file $config_templates_file
 
     # Gather config templates from config template file
     local resource_config
@@ -48,7 +47,6 @@ fn_create_resource_config_from_user_input() {
 
     # Create default config file if it doesn't exist or is empty
     if [ ! -f $config_file ] || [ -z "$(cat $config_file)" ]; then
-        fn_info Create default config file
         jq '{}' -n >$config_file
 
         # Add common config to the default config file if it doesn't exist
@@ -59,7 +57,7 @@ fn_create_resource_config_from_user_input() {
     fi
 
     # Validate default config file
-    fn_validate_json $config_file
+    fn_validate_json_in_file $config_file
 
     # Check whether resource already exists in config file
     local existing_resource
@@ -71,7 +69,6 @@ fn_create_resource_config_from_user_input() {
 
     # Add template resource configurations to config file
     local config_to_add
-    # config_to_add="[{\"name\": \"$resource_name\", \"config\": $resource_config}]"
     config_to_add="[{\"name\": \"$resource_name\", \"config\": $resource_config}]"
     tmp=$(jq ".${resource_tag} += ${config_to_add}" $config_file) || fn_fatal
     echo "$tmp" >$config_file
@@ -79,8 +76,7 @@ fn_create_resource_config_from_user_input() {
     fn_info "Config added in $config_file"
 }
 
-# fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
-selected_resource="image"
+fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
 
 case $selected_resource in
 "repo")
