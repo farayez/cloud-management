@@ -62,6 +62,12 @@ fn_create_resource_config_from_user_input() {
     fn_validate_json $config_file
 
     # Check whether resource already exists in config file
+    local existing_resource
+    existing_resource=$(jq -r ".${resource_tag}[] | select(.name == \"$resource_name\")" $config_file 2>/dev/null)
+    if [ -n "$existing_resource" ]; then
+        fn_error "Resource $resource_name already exists in $config_file"
+        fn_fatal
+    fi
 
     # Add template resource configurations to config file
     local config_to_add
