@@ -130,7 +130,7 @@
       "label": "Pull Parameter",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ssm_parameter:pull", "${input:ssm-parameter}"],
+      "args": ["run", "ssm_parameter:pull", "${input:parameterPicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -145,7 +145,7 @@
       "label": "Push Parameter",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ssm_parameter:push", "${input:ssm-parameter}"],
+      "args": ["run", "ssm_parameter:push", "${input:parameterPicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -214,7 +214,18 @@
         "description": "Which Service?",
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
-        "jsonOption": "content.service[__itemIdx__ ].name"
+        "jsonOption": "content.services[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "parameterPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Parameter?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.ssm_parameters[__itemIdx__ ].name"
       }
     },
     {
