@@ -2,7 +2,7 @@
 
 function fn_populate_config_variables() {
     # Fetch json config for provided stack
-    local config_file_content=$(echo "$(<$root_directory/example.config.json)")
+    local config_file_content=$(echo "$(<$root_directory/configurations/default.config.json)")
 
     # Populate stack level config variables
     fn_populate_config_variables_from_json "$config_file_content"
