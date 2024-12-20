@@ -82,7 +82,7 @@
       "label": "Redeploy Service",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ecs:redeploy_service", "${input:service}"],
+      "args": ["run", "ecs:redeploy_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -97,7 +97,7 @@
       "label": "Exec into Container",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ecs:exec_container", "${input:service}"],
+      "args": ["run", "ecs:exec_container", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -206,6 +206,17 @@
     }
   ],
   "inputs": [
+    {
+      "id": "servicePicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Service?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.service[__itemIdx__ ].name"
+      }
+    },
     {
       "id": "service",
       "type": "command",
