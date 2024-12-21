@@ -12,7 +12,7 @@
     "codedeploy_group_name": {},
     "primary_container_port": {}
   },
-  "ssm-parameter": {
+  "ssm_parameter": {
     "ssm_param_name": ""
   },
   "image": {

@@ -8,7 +8,7 @@ function fn_populate_config_variables() {
     fn_populate_config_variables_from_json "$config_file_content"
 
     # Populate resource level config variables
-    local resource_content=$(echo $config_file_content | jq -r --arg path "$resource_config_path" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
+    local resource_content=$(echo $config_file_content | jq -r --arg path "$resource_tag" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
     fn_populate_config_variables_from_json "$resource_content"
 }
 

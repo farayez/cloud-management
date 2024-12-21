@@ -14,7 +14,7 @@ fn_validate_json_in_file() {
 
 fn_create_resource_config_from_user_input() {
     # First parameter is the resource tag
-    # Should be one of the following: "image", "repo", "ssm-parameter", "secret", "service", "task-definition"
+    # Should be one of the following: "image", "repo", "ssm_parameter", "secret", "service", "task_definition"
     resource_tag=$1
 
     # Validate resource_tag
@@ -90,7 +90,7 @@ case $selected_resource in
 "image")
     fn_create_resource_config_from_user_input $selected_resource
     ;;
-"ssm-parameter")
+"ssm_parameter")
     fn_create_resource_config_from_user_input $selected_resource
     ;;
 "secret")
@@ -99,7 +99,7 @@ case $selected_resource in
 "service")
     fn_create_resource_config_from_user_input $selected_resource
     ;;
-"task-definition")
+"task_definition")
     fn_create_resource_config_from_user_input $selected_resource
 
     # Copy task definition template

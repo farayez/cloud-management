@@ -3,20 +3,20 @@
 declare -A resource_tag_to_directory_map=(
     ["image"]="images"
     ["repo"]="repos"
-    ["ssm-parameter"]="ssm_parameters"
+    ["ssm_parameter"]="ssm_parameters"
     ["secret"]="secrets"
     ["service"]="services"
-    ["task-definition"]="task_definitions"
+    ["task_definition"]="task_definitions"
 )
 
 declare -A script_name_to_resource_tag_map=(
     ["push_image"]="image"
     ["redeploy_service"]="service"
     ["exec_container"]="service"
-    ["pull_ssm_parameter"]="ssm-parameter"
-    ["push_ssm_parameter"]="ssm-parameter"
-    ["register_task_definition"]="task-definition"
-    ["validate_task_definition"]="task-definition"
+    ["pull_ssm_parameter"]="ssm_parameter"
+    ["push_ssm_parameter"]="ssm_parameter"
+    ["register_task_definition"]="task_definition"
+    ["validate_task_definition"]="task_definition"
 )
 
 declare -A script_name_to_parameter_map=(
