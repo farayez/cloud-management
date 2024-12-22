@@ -160,7 +160,11 @@
       "label": "Validate Task Definition",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "task_definition:validate", "${input:task-definition}"],
+      "args": [
+        "run",
+        "task_definition:validate",
+        "${input:taskDefinitionPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -175,7 +179,11 @@
       "label": "Register Task Definition",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "task_definition:register", "${input:task-definition}"],
+      "args": [
+        "run",
+        "task_definition:register",
+        "${input:taskDefinitionPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -214,7 +222,7 @@
         "description": "Which Service?",
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
-        "jsonOption": "content.services[__itemIdx__ ].name"
+        "jsonOption": "content.service[__itemIdx__ ].name"
       }
     },
     {
@@ -225,7 +233,18 @@
         "description": "Which Parameter?",
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
-        "jsonOption": "content.ssm_parameters[__itemIdx__ ].name"
+        "jsonOption": "content.ssm_parameter[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "taskDefinitionPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Task Definition?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.task_definition[__itemIdx__ ].name"
       }
     },
     {
