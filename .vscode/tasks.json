@@ -37,7 +37,7 @@
       "label": "Push Image",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "image:push", "${input:image}"],
+      "args": ["run", "image:push", "${input:imagePicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -52,7 +52,7 @@
       "label": "Start Service",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ecs:start_service", "${input:service}"],
+      "args": ["run", "ecs:start_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -67,7 +67,7 @@
       "label": "Stop Service",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "ecs:stop_service", "${input:service}"],
+      "args": ["run", "ecs:stop_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -113,7 +113,7 @@
       "type": "shell",
       "command": "./update-service.sh",
       "args": [
-        "${input:service}",
+        "${input:servicePicker}",
         "task_definition_revision=${input:taskDefinitionRevision}"
       ],
       "presentation": {
@@ -234,6 +234,17 @@
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
         "jsonOption": "content.ssm_parameter[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "imagePicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Image?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.image[__itemIdx__ ].name"
       }
     },
     {
