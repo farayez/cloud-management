@@ -83,6 +83,8 @@ case $selected_resource in
     # fn_fatal "$selected_resource initialization not available yet"
     fn_request_mandatory_text_input "Enter Git repository URL for initializtion: " git_url
 
+    fn_populate_and_validate_resource_directory_from_resource_tag
+
     resource_tag=$selected_resource
     fn_populate_and_validate_resource_directory_from_resource_tag
     git -C $resource_directory clone $git_url || fn_fatal
@@ -101,6 +103,8 @@ case $selected_resource in
     ;;
 "task_definition")
     fn_create_resource_config_from_user_input $selected_resource
+
+    fn_populate_and_validate_resource_directory_from_resource_tag
 
     # Copy task definition template
     if [ -f "$resource_directory/definitions/$resource_name.pushable.json" ]; then

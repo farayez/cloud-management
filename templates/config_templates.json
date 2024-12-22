@@ -22,5 +22,8 @@
     "image_name": "",
     "image_url": {},
     "image_tag": {}
+  },
+  "task_definition": {
+    "task_definition_file": {}
   }
 }
