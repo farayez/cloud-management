@@ -12,6 +12,6 @@ result=$(fn_run ssm-get-parameter \
     --query 'Parameter.Value') || fn_fatal
 
 mkdir -p parameters || fn_fatal
-echo "$result" >parameters/$resource_name.pulled
+echo "$result" >parameters/$resource_name.sync
 
 fn_success "Parameter pulled from SSM Parameter Store"
