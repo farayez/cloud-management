@@ -44,6 +44,14 @@ fn_run() {
         return 1
     }
 
+    # Check if .gitignore file is present, if not copy from template
+    if [[ ! -f "$root_directory/history/.gitignore" ]]; then
+        cp "$root_directory/templates/history.gitignore.template" "$root_directory/history/.gitignore" || {
+            fn_error "Could not copy .gitignore template to $history_directory"
+            return 1
+        }
+    fi
+
     # Write the command information to the history file
     local history_file="$history_directory/${current_execution_id}.${current_script_name}.history"
     touch "$history_file"
