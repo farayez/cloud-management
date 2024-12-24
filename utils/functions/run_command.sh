@@ -38,7 +38,7 @@ fn_run() {
     local cmd="${arguments[0]}"
 
     # Ensure the command history directory exists
-    local history_directory="history/$resource_name"
+    local history_directory="$root_directory/history/$resource_tag/$resource_name"
     mkdir -p "$history_directory" || {
         fn_error "Could not create directory $history_directory"
         return 1
