@@ -77,6 +77,7 @@ fn_create_resource_config_from_user_input() {
 }
 
 fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
+resource_tag=$selected_resource
 
 case $selected_resource in
 "repo")
@@ -84,15 +85,13 @@ case $selected_resource in
     fn_request_mandatory_text_input "Enter Git repository URL for initializtion: " git_url
 
     fn_populate_and_validate_resource_directory_from_resource_tag
-
-    resource_tag=$selected_resource
-    fn_populate_and_validate_resource_directory_from_resource_tag
     git -C $resource_directory clone $git_url || fn_fatal
     ;;
 "image")
     fn_create_resource_config_from_user_input $selected_resource
     ;;
 "ssm_parameter")
+    fn_populate_and_validate_resource_directory_from_resource_tag
     fn_create_resource_config_from_user_input $selected_resource
     ;;
 "secret")
@@ -110,7 +109,7 @@ case $selected_resource in
     if [ -f "$resource_directory/definitions/$resource_name.pushable.json" ]; then
         fn_error "Task definition file for $resource_name already exists. Not overwriting."
     else
-        cp templates/task-definition.template.json $resource_directory/definitions/$resource_name.pushable.json || fn_fatal
+        cp templates/task-definition.template.json $resource_directory/$resource_name.pushable.json || fn_fatal
     fi
     ;;
 *)
