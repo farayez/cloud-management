@@ -106,7 +106,7 @@ case $selected_resource in
     fn_populate_and_validate_resource_directory_from_resource_tag
 
     # Copy task definition template
-    if [ -f "$resource_directory/definitions/$resource_name.pushable.json" ]; then
+    if [ -f "$resource_directory/$resource_name.pushable.json" ]; then
         fn_error "Task definition file for $resource_name already exists. Not overwriting."
     else
         cp templates/task-definition.template.json $resource_directory/$resource_name.pushable.json || fn_fatal

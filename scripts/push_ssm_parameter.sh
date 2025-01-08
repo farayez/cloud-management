@@ -4,7 +4,7 @@
 
 fn_validate_variables aws_region ssm_param_name
 
-parameter_file=parameters/$resource_name.sync
+parameter_file=$root_directory/parameters/$resource_name.sync
 
 if [ ! -f "$parameter_file" ]; then
     fn_error "Parameter file $parameter_file does not exist"
