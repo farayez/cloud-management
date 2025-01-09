@@ -75,10 +75,10 @@ function fn_populate_and_validate_resource_name() {
     fi
 
     # Check for resource config
-    if [ ! -f "$resource_directory/$resource_name.config.sh" ]; then
-        fn_error "No $resource_tag found with name $resource_name"
-        fn_fatal
-    fi
+    # if [ ! -f "$resource_directory/$resource_name.config.sh" ]; then
+    #     fn_error "No $resource_tag found with name $resource_name"
+    #     fn_fatal
+    # fi
 }
 
 function fn_populate_and_validate_resource_config_file() {
