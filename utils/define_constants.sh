@@ -7,6 +7,7 @@ declare -A resource_tag_to_directory_map=(
     ["secret"]="secrets"
     ["service"]="services"
     ["task_definition"]="task_definitions"
+    ["cf_template"]="cf_templates"
 )
 
 declare -A script_name_to_resource_tag_map=(

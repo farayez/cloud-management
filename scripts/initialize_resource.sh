@@ -112,6 +112,10 @@ case $selected_resource in
         cp templates/task-definition.template.json $resource_directory/$resource_name.pushable.json || fn_fatal
     fi
     ;;
+"cf_template")
+    fn_populate_and_validate_resource_directory_from_resource_tag
+    fn_fatal "$selected_resource initialization not available yet"
+    ;;
 *)
     fn_fatal "invalid selection"
     ;;
