@@ -25,5 +25,8 @@
   },
   "task_definition": {
     "task_definition_file": {}
+  },
+  "cf_template": {
+    "template_file": {}
   }
 }

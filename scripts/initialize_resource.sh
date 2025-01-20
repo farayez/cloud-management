@@ -114,7 +114,7 @@ case $selected_resource in
     ;;
 "cf_template")
     fn_populate_and_validate_resource_directory_from_resource_tag
-    fn_fatal "$selected_resource initialization not available yet"
+    fn_create_resource_config_from_user_input $selected_resource
     ;;
 *)
     fn_fatal "invalid selection"
