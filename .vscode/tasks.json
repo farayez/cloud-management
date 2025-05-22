@@ -7,6 +7,7 @@
       "label": "Initialize Resource",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "resource:init"],
       "presentation": {
         "reveal": "always",
@@ -22,6 +23,7 @@
       "label": "Clear Resource History",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "resource:clear_history"],
       "presentation": {
         "reveal": "always",
@@ -37,6 +39,7 @@
       "label": "Push Image",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "image:push", "${input:imagePicker}"],
       "presentation": {
         "reveal": "always",
@@ -52,6 +55,7 @@
       "label": "Start Service",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ecs:start_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
@@ -67,6 +71,7 @@
       "label": "Stop Service",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ecs:stop_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
@@ -82,6 +87,7 @@
       "label": "Redeploy Service",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ecs:redeploy_service", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
@@ -97,6 +103,7 @@
       "label": "Exec into Container",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ecs:exec_container", "${input:servicePicker}"],
       "presentation": {
         "reveal": "always",
@@ -112,6 +119,7 @@
       "label": "Update Service",
       "type": "shell",
       "command": "./update-service.sh",
+      "problemMatcher": [],
       "args": [
         "${input:servicePicker}",
         "task_definition_revision=${input:taskDefinitionRevision}"
@@ -130,6 +138,7 @@
       "label": "Pull Parameter",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ssm_parameter:pull", "${input:parameterPicker}"],
       "presentation": {
         "reveal": "always",
@@ -145,6 +154,7 @@
       "label": "Push Parameter",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": ["run", "ssm_parameter:push", "${input:parameterPicker}"],
       "presentation": {
         "reveal": "always",
@@ -160,6 +170,7 @@
       "label": "Validate Task Definition",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": [
         "run",
         "task_definition:validate",
@@ -179,6 +190,7 @@
       "label": "Register Task Definition",
       "type": "shell",
       "command": "npm",
+      "problemMatcher": [],
       "args": [
         "run",
         "task_definition:register",
@@ -198,6 +210,7 @@
       "label": "Test Integration",
       "type": "shell",
       "command": "./test.sh",
+      "problemMatcher": [],
       "args": ["${input:service}", "${input:testCommand}"],
       "presentation": {
         "showReuseMessage": false
@@ -207,6 +220,7 @@
       "label": "View Variables",
       "type": "shell",
       "command": "./view-variables.sh",
+      "problemMatcher": [],
       "args": ["${input:service}"],
       "presentation": {
         "showReuseMessage": false
