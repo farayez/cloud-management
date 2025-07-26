@@ -7,7 +7,7 @@ declare -A resource_tag_to_directory_map=(
     ["secret"]="secrets"
     ["service"]="services"
     ["task_definition"]="task_definitions"
-    ["cf_template"]="cf_templates"
+    ["cloudformation"]="cloudformation"
 )
 
 declare -A script_name_to_resource_tag_map=(
@@ -18,6 +18,7 @@ declare -A script_name_to_resource_tag_map=(
     ["push_ssm_parameter"]="ssm_parameter"
     ["register_task_definition"]="task_definition"
     ["validate_task_definition"]="task_definition"
+    ["create_cloudformation_stack"]="cloudformation"
 )
 
 declare -A script_name_to_parameter_map=(
