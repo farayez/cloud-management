@@ -207,6 +207,26 @@
       }
     },
     {
+      "label": "Create CloudFormation Stack",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": [
+        "run",
+        "cloudformation:create_stack",
+        "${input:cfStackPicker}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "CloudFormation"
+      }
+    },
+    {
       "label": "Test Integration",
       "type": "shell",
       "command": "./test.sh",
@@ -270,6 +290,17 @@
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
         "jsonOption": "content.task_definition[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "cfStackPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which CloudFormation Stack?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.cloudformation[__itemIdx__ ].name"
       }
     },
     {
