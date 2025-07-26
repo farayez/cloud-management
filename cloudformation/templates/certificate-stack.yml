@@ -1,0 +1,27 @@
+Parameters:
+  DomainName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "253"
+    AllowedPattern: ^(\*\.)?(((?!-)[A-Za-z0-9-]{0,62}[A-Za-z0-9])\.)+((?!-)[A-Za-z0-9-]{1,62}[A-Za-z0-9])$
+  TagDomain:
+    Type: String
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      CertificateTransparencyLoggingPreference: ENABLED
+      DomainName: !Ref DomainName
+      KeyAlgorithm: RSA_2048
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+      ValidationMethod: DNS
+
+Outputs:
+  CertificateArn:
+    Description: Arn of the created certificate
+    Value: !Ref Certificate
+    Export:
+      Name: !Sub ${AWS::StackName}-Certificate
