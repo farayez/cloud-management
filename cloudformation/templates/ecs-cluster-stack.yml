@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ClusterName:
+    Type: String
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+  TagEnv:
+    Type: String
+    AllowedValues:
+      - production
+      - staging
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+
+Output:
+  ClusterName:
+    Description: The created cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub ${AWS::StackName}-Cluster
