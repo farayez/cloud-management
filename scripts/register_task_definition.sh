@@ -6,7 +6,7 @@ fn_validate_variables resource_name root_directory aws_region
 
 # Prepare task definition file if empty
 if [ -z "$task_definition_file" ]; then
-    task_definition_file=$root_directory/task_definitions/$resource_name.pushable.json
+    task_definition_file=$root_directory/task_definitions/$resource_name.json
 fi
 
 # Ensure task definition file exists
