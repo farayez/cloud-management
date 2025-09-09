@@ -8,6 +8,7 @@ declare -A resource_tag_to_directory_map=(
     ["service"]="services"
     ["task_definition"]="task_definitions"
     ["s3_data"]="s3_data"
+    ["s3_application"]="s3_data"
     ["cloudformation"]="cloudformation"
 )
 
@@ -20,6 +21,7 @@ declare -A script_name_to_resource_tag_map=(
     ["register_task_definition"]="task_definition"
     ["validate_task_definition"]="task_definition"
     ["sync_with_s3"]="s3_data"
+    ["deploy_to_s3"]="s3_application"
     ["create_cloudformation_stack"]="cloudformation"
 )
 
@@ -43,6 +45,7 @@ declare -A command_map=(
     ["docker-push"]="docker push,--unbuffered-echo"
     ["register-task-definition"]="aws ecs register-task-definition,--no-echo"
     ["s3-sync"]="aws s3 sync"
+    ["bash"]="bash -c,--unbuffered-echo"
     ["git"]="git"
 )
 
