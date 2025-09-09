@@ -12,6 +12,7 @@
     "ssm_parameter:push": "./scripts/push_ssm_parameter.sh",
     "task_definition:validate": "./scripts/validate_task_definition.sh",
     "task_definition:register": "./scripts/register_task_definition.sh",
+    "s3:sync": "./scripts/sync_with_s3.sh",
     "cloudformation:create_stack": "./scripts/create_cloudformation_stack.sh"
   }
 }
