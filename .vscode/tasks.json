@@ -108,7 +108,7 @@
       "presentation": {
         "reveal": "always",
         "focus": true,
-        "panel": "shared",
+        "panel": "dedicated",
         "showReuseMessage": false,
         "clear": false,
         "echo": false,
