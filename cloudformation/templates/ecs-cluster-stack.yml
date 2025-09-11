@@ -10,6 +10,7 @@ Parameters:
       - primary
       - secondary
       - utility
+      - all
   TagEnv:
     Type: String
     AllowedValues:
@@ -22,7 +23,7 @@ Resources:
     Properties:
       ClusterName: !Ref ClusterName
 
-Output:
+Outputs:
   ClusterName:
     Description: The created cluster
     Value: !Ref ECSCluster
