@@ -37,7 +37,7 @@ fi
 
 # exit 1
 
-aws cloudformation create-stack \
+fn_run create-cf-stack \
     --stack-name $stack_name \
     --region $aws_region \
     $parameters_option \
