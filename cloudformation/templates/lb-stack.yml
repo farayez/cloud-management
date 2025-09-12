@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for the stack
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnets for Load balancer
+  LoadBalancerName:
+    Type: String
+    Description: Name of the Load Balancer
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+  TagEnv:
+    Type: String
+    AllowedValues:
+      - production
+      - staging
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Security group for ${LoadBalancerName}. Allows inbound HTTPS traffic.
+      GroupName: !Sub ${LoadBalancerName}-sg
+      SecurityGroupEgress:
+        - Description: Allow all outbound traffic
+          IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - Description: Allow all inbound HTTPS traffic
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+        - Key: Name
+          Value: !Sub ${LoadBalancerName}-sg
+      VpcId: !Ref VpcId
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Ref LoadBalancerName
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref SecurityGroup
+      Subnets: !Ref SubnetIds
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+      Type: application
+
+Outputs:
+  SecurityGroups:
+    Description: The created security group Ids
+    Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-SecurityGroups
+  LoadBalancer:
+    Description: The created load balancer
+    Value: !Ref LoadBalancer
+    Export:
+      Name: !Sub ${AWS::StackName}-LoadBalancer
+  Vpc:
+    Description: The Vpc of the security group
+    Value: !Ref VpcId
+    Export:
+      Name: !Sub ${AWS::StackName}-Vpc
+  Subnets:
+    Description: The Subnets of the load balancer
+    Value: !Join
+      - ","
+      - !Ref SubnetIds
+    Export:
+      Name: !Sub ${AWS::StackName}-Subnets
