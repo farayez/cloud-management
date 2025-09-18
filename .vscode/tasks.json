@@ -167,6 +167,22 @@
       }
     },
     {
+      "label": "Deploy To S3",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "s3:deploy", "${input:s3-application-picker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "S3"
+      }
+    },
+    {
       "label": "Validate Task Definition",
       "type": "shell",
       "command": "npm",
@@ -211,11 +227,7 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": [
-        "run",
-        "cloudformation:create_stack",
-        "${input:cfStackPicker}"
-      ],
+      "args": ["run", "cloudformation:create_stack", "${input:cfStackPicker}"],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -367,6 +379,17 @@
         "display": "transform",
         "showDirs": false,
         "keyRemember": "selectedParameter"
+      }
+    },
+    {
+      "id": "s3-application-picker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Service?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.s3_application[__itemIdx__ ].name"
       }
     },
     {
