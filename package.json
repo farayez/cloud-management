@@ -14,6 +14,7 @@
     "task_definition:register": "./scripts/register_task_definition.sh",
     "s3:sync": "./scripts/sync_with_s3.sh",
     "s3:deploy": "./scripts/deploy_to_s3.sh",
+    "cloudfront:invalidate": "./scripts/invalidate_cloudfront_dist.sh",
     "cloudformation:create_stack": "./scripts/create_cloudformation_stack.sh"
   }
 }
