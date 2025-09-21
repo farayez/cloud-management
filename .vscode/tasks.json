@@ -183,6 +183,22 @@
       }
     },
     {
+      "label": "Invalidate CloudFront Distribution",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "cloudfront:invalidate", "${input:cloudfront-picker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Cloudfront"
+      }
+    },
+    {
       "label": "Validate Task Definition",
       "type": "shell",
       "command": "npm",
@@ -390,6 +406,17 @@
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
         "jsonOption": "content.s3_application[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "cloudfront-picker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which CloudFront Distribution?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.cloudfront[__itemIdx__ ].name"
       }
     },
     {
