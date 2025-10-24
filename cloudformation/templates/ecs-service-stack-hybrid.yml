@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ECSServiceName:
+    Type: String
+  TaskDefinitionArn:
+    Type: String
+  ClusterStackName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+  LoadBalancerStackName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+  ApplicationPort:
+    Type: Number
+    Default: 80
+    MinValue: 1
+    MaxValue: 65535
+  HealthCheckPath:
+    Type: String
+    Default: /api/app-health
+    MinLength: 1
+    MaxLength: 255
+  CertificateArn:
+    Type: String
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+  TagEnv:
+    Type: String
+    AllowedValues:
+      - production
+      - staging
+
+Resources:
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !ImportValue
+        Fn::Sub: ${LoadBalancerStackName}-LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Sub ${CertificateArn}
+    DependsOn:
+      - TargetGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: !Ref HealthCheckPath
+      HealthCheckPort: "traffic-port"
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      IpAddressType: ipv4
+      Name: !Sub ${ECSServiceName}-tg
+      Port: !Ref ApplicationPort
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "300"
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
+        - Key: slow_start.duration_seconds
+          Value: "0"
+      TargetType: ip
+      UnhealthyThresholdCount: 3
+      VpcId: !ImportValue
+        Fn::Sub: ${LoadBalancerStackName}-Vpc
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Common security group for ${ECSServiceName} ECS Service.
+      GroupName: !Sub ${ECSServiceName}-task-sg
+      SecurityGroupEgress:
+        - Description: Allow all outbound traffic
+          IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - Description: Allow all inbound SSH traffic
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - Description: Allow all inbound HTTP traffic
+          IpProtocol: tcp
+          FromPort: !Ref ApplicationPort
+          ToPort: !Ref ApplicationPort
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+        - Key: Name
+          Value: !Sub ${ECSServiceName}-task-sg
+      VpcId: !ImportValue
+        Fn::Sub: ${LoadBalancerStackName}-Vpc
+
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !ImportValue
+        Fn::Sub: ${ClusterStackName}-Cluster
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 1
+          Weight: 1
+        - CapacityProvider: FARGATE_SPOT
+          Base: 0
+          Weight: 1
+      TaskDefinition: !Ref TaskDefinitionArn
+      ServiceName: !Ref ECSServiceName
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: application
+          ContainerPort: !Ref ApplicationPort
+          LoadBalancerName: !Ref AWS::NoValue
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref SecurityGroup
+          Subnets: !Split
+            - ","
+            - !ImportValue
+              Fn::Sub: ${LoadBalancerStackName}-Subnets
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: false
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      PropagateTags: TASK_DEFINITION
+      EnableECSManagedTags: true
+    DependsOn:
+      - Listener
+
+Outputs:
+  ECSService:
+    Description: The created service.
+    Value: !Ref ECSService
