@@ -25,6 +25,7 @@ declare -A script_name_to_resource_tag_map=(
     ["deploy_to_s3"]="s3_application"
     ["invalidate_cloudfront_dist"]="cloudfront"
     ["create_cloudformation_stack"]="cloudformation"
+    ["update_cloudformation_stack"]="cloudformation"
 )
 
 declare -A script_name_to_parameter_map=(
@@ -47,6 +48,7 @@ declare -A command_map=(
     ["docker-push"]="docker push,--unbuffered-echo"
     ["register-task-definition"]="aws ecs register-task-definition,--unbuffered-echo"
     ["create-cf-stack"]="aws cloudformation create-stack,--unbuffered-echo"
+    ["update-cf-stack"]="aws cloudformation update-stack,--unbuffered-echo"
     ["s3-sync"]="aws s3 sync"
     ["invalidate-cloudfront"]="aws cloudfront create-invalidation,--unbuffered-echo"
     ["bash"]="bash -c,--unbuffered-echo"

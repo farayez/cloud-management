@@ -255,6 +255,22 @@
       }
     },
     {
+      "label": "Update CloudFormation Stack",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "cloudformation:update_stack", "${input:cfStackPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "CloudFormation"
+      }
+    },
+    {
       "label": "Test Integration",
       "type": "shell",
       "command": "./test.sh",
