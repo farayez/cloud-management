@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ECSServiceName:
     Type: String
+  ECSServiceNameShort:
+    Type: String
+    MaxLength: 10
   TaskDefinitionArn:
     Type: String
   ClusterStackName:
@@ -14,11 +17,23 @@ Parameters:
     MinLength: "1"
     MaxLength: "255"
     AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
-  ApplicationPort:
+  ApplicationPort1:
     Type: Number
     Default: 80
     MinValue: 1
     MaxValue: 65535
+  ApplicationPort2:
+    Type: Number
+    Default: 8080
+    MinValue: 1
+    MaxValue: 65535
+  ApplicationContainer1:
+    Type: String
+  ApplicationContainer2:
+    Type: String
+  ApplicationHost2:
+    Type: String
+    AllowedPattern: ^([a-zA-Z0-9][-a-zA-Z0-9]*\.)*[a-zA-Z0-9][-a-zA-Z0-9]*$
   HealthCheckPath:
     Type: String
     Default: /api/app-health
@@ -46,7 +61,7 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref TargetGroup
+          TargetGroupArn: !Ref TargetGroup1
       LoadBalancerArn: !ImportValue
         Fn::Sub: ${LoadBalancerStackName}-LoadBalancer
       Port: 443
@@ -54,9 +69,23 @@ Resources:
       Certificates:
         - CertificateArn: !Sub ${CertificateArn}
     DependsOn:
-      - TargetGroup
+      - TargetGroup1
 
-  TargetGroup:
+  Application2ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Listener
+      Priority: 20
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - !Ref ApplicationHost2
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup2
+
+  TargetGroup1:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       HealthCheckIntervalSeconds: 10
@@ -66,8 +95,41 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 5
       IpAddressType: ipv4
-      Name: !Sub ${ECSServiceName}-tg
-      Port: !Ref ApplicationPort
+      Name: !Sub ${ECSServiceNameShort}-tg1
+      Port: !Ref ApplicationPort1
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "300"
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
+        - Key: slow_start.duration_seconds
+          Value: "0"
+      TargetType: ip
+      UnhealthyThresholdCount: 3
+      VpcId: !ImportValue
+        Fn::Sub: ${LoadBalancerStackName}-Vpc
+
+  TargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: !Ref HealthCheckPath
+      HealthCheckPort: "traffic-port"
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      IpAddressType: ipv4
+      Name: !Sub ${ECSServiceNameShort}-tg2
+      Port: !Ref ApplicationPort2
       Protocol: HTTP
       ProtocolVersion: HTTP1
       Tags:
@@ -104,10 +166,15 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-        - Description: Allow all inbound HTTP traffic
+        - Description: Allow all inbound HTTP traffic to ApplicationPort1
           IpProtocol: tcp
-          FromPort: !Ref ApplicationPort
-          ToPort: !Ref ApplicationPort
+          FromPort: !Ref ApplicationPort1
+          ToPort: !Ref ApplicationPort1
+          CidrIp: 0.0.0.0/0
+        - Description: Allow all inbound HTTP traffic to ApplicationPort2
+          IpProtocol: tcp
+          FromPort: !Ref ApplicationPort2
+          ToPort: !Ref ApplicationPort2
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: domain
@@ -138,10 +205,14 @@ Resources:
       SchedulingStrategy: REPLICA
       DesiredCount: 1
       LoadBalancers:
-        - ContainerName: application
-          ContainerPort: !Ref ApplicationPort
+        - ContainerName: !Ref ApplicationContainer1
+          ContainerPort: !Ref ApplicationPort1
           LoadBalancerName: !Ref AWS::NoValue
-          TargetGroupArn: !Ref TargetGroup
+          TargetGroupArn: !Ref TargetGroup1
+        - ContainerName: !Ref ApplicationContainer2
+          ContainerPort: !Ref ApplicationPort2
+          LoadBalancerName: !Ref AWS::NoValue
+          TargetGroupArn: !Ref TargetGroup2
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
