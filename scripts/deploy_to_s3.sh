@@ -27,6 +27,15 @@ fn_run git -C $repo_directory pull || fn_fatal
 
 echo $repo_directory
 
+# Handle environment variables if provided
+if [ -v env ]; then
+    fn_section_start "Configuring Environment Variables"
+    env_file="$repo_directory/.env"
+    
+    # Parse and write env variables to .env file
+    echo "$env" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > "$env_file" || fn_fatal
+fi
+
 # Build Application
 fn_section_start "Build Application"
 cd $root_directory/repos/$repo || fn_fatal
