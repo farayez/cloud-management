@@ -116,6 +116,22 @@
       }
     },
     {
+      "label": "SSH into Server",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "server:ssh", "${input:serverPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
       "label": "Update Service",
       "type": "shell",
       "command": "./update-service.sh",
@@ -301,6 +317,17 @@
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
         "jsonOption": "content.service[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "serverPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Server?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.server[__itemIdx__ ].name"
       }
     },
     {

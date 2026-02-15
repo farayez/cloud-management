@@ -11,6 +11,7 @@ declare -A resource_tag_to_directory_map=(
     ["s3_application"]="s3_data"
     ["cloudfront"]="cloudfront"
     ["cloudformation"]="cloudformation"
+    ["server"]="servers"
 )
 
 declare -A script_name_to_resource_tag_map=(
@@ -28,6 +29,7 @@ declare -A script_name_to_resource_tag_map=(
     ["invalidate_cloudfront_dist"]="cloudfront"
     ["create_cloudformation_stack"]="cloudformation"
     ["update_cloudformation_stack"]="cloudformation"
+    ["ssh_into_server"]="server"
 )
 
 declare -A script_name_to_parameter_map=(
