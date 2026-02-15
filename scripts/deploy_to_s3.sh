@@ -29,8 +29,13 @@ echo $repo_directory
 
 # Handle environment variables if provided
 if [ -v env ]; then
+    # Set $env_file to .env by default if not provided in config
+    if [ ! -v env_file ]; then
+        env_file=".env"
+    fi
+
     fn_section_start "Configuring Environment Variables"
-    env_file="$repo_directory/.env"
+    env_file="$repo_directory/$env_file"
     
     # Parse and write env variables to .env file
     echo "$env" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > "$env_file" || fn_fatal
