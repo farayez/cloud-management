@@ -26,6 +26,13 @@ if [ ! -v image_tag ]; then
     image_tag=$(echo "${branch_suffix:+$branch_suffix.}latest")
 fi
 
+# If platform is specified, add it as a build argument, otherwise default to linux/amd64
+if [ -v platform ]; then
+    build_platform="--platform=$platform"
+else
+    build_platform="--platform=linux/amd64"
+fi
+
 fn_validate_variables image_url image_tag
 
 # Update codebase
@@ -43,7 +50,7 @@ fi
 
 # Build, tag and push image
 fn_section_start "Build and push image"
-fn_run docker-build -t $image_name $build_directory || fn_fatal
+fn_run docker-build $build_platform -t $image_name $build_directory || fn_fatal
 aws ecr get-login-password --region $aws_region | docker login --username AWS --password-stdin $ecr_url || fn_fatal
 fn_run docker-tag $image_name:latest $image_url:$image_tag || fn_fatal
 fn_run docker-push $image_url:$image_tag
