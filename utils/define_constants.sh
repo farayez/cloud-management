@@ -30,6 +30,7 @@ declare -A script_name_to_resource_tag_map=(
     ["create_cloudformation_stack"]="cloudformation"
     ["update_cloudformation_stack"]="cloudformation"
     ["ssh_into_server"]="server"
+    ["copy_to_server"]="server"
 )
 
 declare -A script_name_to_parameter_map=(

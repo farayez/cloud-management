@@ -132,6 +132,22 @@
       }
     },
     {
+      "label": "Copy to Server",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "server:copy", "${input:serverPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
       "label": "Update Service",
       "type": "shell",
       "command": "./update-service.sh",
