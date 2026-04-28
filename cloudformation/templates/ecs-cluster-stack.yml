@@ -13,15 +13,30 @@ Parameters:
       - all
   TagEnv:
     Type: String
+    Default: ""
     AllowedValues:
       - production
       - staging
+      - "" # Allows the "empty" selection
+
+Conditions:
+  HasEnvTag: !Not [!Equals [!Ref TagEnv, ""]]
 
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Ref ClusterName
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - !If
+          - HasEnvTag
+          - Key: env
+            Value: !Ref TagEnv
+          - !Ref AWS::NoValue
 
 Outputs:
   ClusterName:
