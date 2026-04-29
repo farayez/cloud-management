@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ECSServiceName:
+    Type: String
+    Description: Name of the ECS service to enable autoscaling for
+  ClusterStackName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+    Description: Name of the CloudFormation stack that created the ECS cluster
+  MinCapacity:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    Description: Minimum number of tasks
+  MaxCapacity:
+    Type: Number
+    Default: 10
+    MinValue: 1
+    Description: Maximum number of tasks
+  TargetCPUUtilization:
+    Type: Number
+    Default: 70
+    MinValue: 1
+    MaxValue: 100
+    Description: Target CPU utilization percentage for target tracking
+  HighCPUThreshold:
+    Type: Number
+    Default: 95
+    MinValue: 1
+    MaxValue: 100
+    Description: CPU threshold for step scaling alarm
+  StepScalingAdjustment:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    Description: Number of tasks to add when step scaling is triggered
+
+Resources:
+  ScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref MaxCapacity
+      MinCapacity: !Ref MinCapacity
+      ResourceId: !Sub service/${ClusterStackName}-Cluster/${ECSServiceName}
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  TargetTrackingScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub ${ECSServiceName}-cpu-target-tracking-policy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: !Ref TargetCPUUtilization
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 300
+        DisableScaleIn: false
+    DependsOn:
+      - ScalableTarget
+
+  CPUAlarmHigh:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${ECSServiceName}-cpu-high-alarm
+      AlarmDescription: !Sub Alarm when ${ECSServiceName} CPU exceeds ${HighCPUThreshold}%
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: !Ref HighCPUThreshold
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: ServiceName
+          Value: !Ref ECSServiceName
+        - Name: ClusterName
+          Value: !Sub ${ClusterStackName}-Cluster
+      AlarmActions:
+        - !Ref StepScalingPolicy
+
+  StepScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub ${ECSServiceName}-cpu-step-scaling-policy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref ScalableTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 0
+        MetricAggregationType: Maximum
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: !Ref StepScalingAdjustment
+    DependsOn:
+      - ScalableTarget
+
+Outputs:
+  ScalableTargetId:
+    Description: The ID of the scalable target
+    Value: !Ref ScalableTarget
+    Export:
+      Name: !Sub ${AWS::StackName}-ScalableTarget
+
+  TargetTrackingPolicyArn:
+    Description: ARN of the target tracking scaling policy
+    Value: !Ref TargetTrackingScalingPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-TargetTrackingPolicy
+
+  StepScalingPolicyArn:
+    Description: ARN of the step scaling policy
+    Value: !Ref StepScalingPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-StepScalingPolicy
+
+  CPUAlarmArn:
+    Description: ARN of the high CPU alarm
+    Value: !GetAtt CPUAlarmHigh.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-CPUAlarm
