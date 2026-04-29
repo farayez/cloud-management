@@ -27,7 +27,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: !Sub Security group for ${LoadBalancerName}. Allows inbound HTTPS traffic.
+      GroupDescription: !Sub Common security group for ${LoadBalancerName}.
       GroupName: !Sub ${LoadBalancerName}-sg
       SecurityGroupEgress:
         - Description: Allow all outbound traffic
