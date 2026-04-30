@@ -37,7 +37,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: !Sub Common security group for ${ECSServiceName}.
-      GroupName: !Sub ${ECSServiceName}-sg
+      GroupName: !Sub ${ECSServiceName}-task-sg
       SecurityGroupIngress:
         - Description: Allow all inbound SSH traffic
           IpProtocol: tcp
@@ -56,7 +56,7 @@ Resources:
         - Key: env
           Value: !Ref TagEnv
         - Key: Name
-          Value: !Sub ${ECSServiceName}-sg
+          Value: !Sub ${ECSServiceName}-task-sg
       VpcId: !Ref VpcId
 
   ECSService:
