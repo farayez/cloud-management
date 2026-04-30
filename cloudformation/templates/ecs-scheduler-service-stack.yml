@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The template used to create an ECS Scheduler Service .
+Parameters:
+  ClusterStackName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+  ECSServiceName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+  TaskDefinitionArn:
+    Type: String
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnets for the ECS service
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for the stack
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+  TagEnv:
+    Type: String
+    AllowedValues:
+      - production
+      - staging
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Common security group for ${ECSServiceName}.
+      GroupName: !Sub ${ECSServiceName}-task-sg
+      SecurityGroupIngress:
+        - Description: Allow all inbound SSH traffic
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - Description: Allow all outbound traffic
+          IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+        - Key: Name
+          Value: !Sub ${ECSServiceName}-task-sg
+      VpcId: !Ref VpcId
+
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !ImportValue
+        Fn::Sub: ${ClusterStackName}-Cluster
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 1
+          Weight: 1
+      TaskDefinition: !Ref TaskDefinitionArn
+      ServiceName: !Ref ECSServiceName
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref SecurityGroup
+          Subnets: !Ref SubnetIds
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+      EnableECSManagedTags: true
+Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !ImportValue
+      Fn::Sub: ${ClusterStackName}-Cluster
+  ECSService:
+    Description: The created service.
+    Value: !Ref ECSService
