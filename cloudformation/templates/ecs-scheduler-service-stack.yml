@@ -19,6 +19,12 @@ Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID for the stack
+  AssignPublicIp:
+    Type: String
+    AllowedValues:
+      - ENABLED
+      - DISABLED
+    Default: DISABLED
   TagDomain:
     Type: String
   TagClass:
@@ -38,12 +44,6 @@ Resources:
     Properties:
       GroupDescription: !Sub Common security group for ${ECSServiceName}.
       GroupName: !Sub ${ECSServiceName}-task-sg
-      SecurityGroupIngress:
-        - Description: Allow all inbound SSH traffic
-          IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - Description: Allow all outbound traffic
           IpProtocol: "-1"
@@ -74,7 +74,7 @@ Resources:
       DesiredCount: 1
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          AssignPublicIp: !Ref AssignPublicIp
           SecurityGroups:
             - !Ref SecurityGroup
           Subnets: !Ref SubnetIds

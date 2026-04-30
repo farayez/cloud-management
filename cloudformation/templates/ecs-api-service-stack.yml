@@ -26,6 +26,12 @@ Parameters:
     MaxLength: 255
   CertificateArn:
     Type: String
+  AssignPublicIp:
+    Type: String
+    AllowedValues:
+      - ENABLED
+      - DISABLED
+    Default: DISABLED
   TagDomain:
     Type: String
   TagClass:
@@ -99,11 +105,6 @@ Resources:
           IpProtocol: "-1"
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
-        - Description: Allow all inbound SSH traffic
-          IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
         - Description: Allow all inbound HTTP traffic
           IpProtocol: tcp
           FromPort: !Ref ApplicationPort
@@ -144,7 +145,7 @@ Resources:
           TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+          AssignPublicIp: !Ref AssignPublicIp
           SecurityGroups:
             - !Ref SecurityGroup
           Subnets: !Split
