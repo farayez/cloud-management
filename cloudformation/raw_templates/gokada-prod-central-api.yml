@@ -1,0 +1,197 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The template used to create an ECS Service from the ECS Console.
+Parameters:
+  ECSClusterName:
+    Type: String
+    Default: gokada-prod-primary
+  ECSServiceName:
+    Type: String
+    Default: gokada-prod-central-api
+  SecurityGroupIDs:
+    Type: CommaDelimitedList
+    Default: sg-09a632b8f96a6daab
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Default: subnet-9d0659fa,subnet-4d361704,subnet-904dd5cb
+  VpcID:
+    Type: String
+    Default: vpc-31250a56
+  LoadBalancerName:
+    Type: String
+    Default: gokada-prod-central-api-lb
+  ApplicationName:
+    Type: String
+    Default: AppECS-gokada-prod-primary-gokada-prod-central-api
+  DeploymentGroupName:
+    Type: String
+    Default: DgpECS-gokada-prod-primary-gokada-prod-central-api
+Resources:
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: gokada-prod-primary
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 0
+          Weight: 1
+      TaskDefinition: arn:aws:ecs:eu-west-1:525408006129:task-definition/gokada-prod-central-api:3
+      ServiceName: gokada-prod-central-api
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: application
+          ContainerPort: 80
+          LoadBalancerName: !Ref AWS::NoValue
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: !Ref SecurityGroupIDs
+          Subnets: !Ref SubnetIDs
+      PlatformVersion: LATEST
+      DeploymentController:
+        Type: CODE_DEPLOY
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      PropagateTags: TASK_DEFINITION
+      EnableECSManagedTags: true
+    DependsOn:
+      - Listener
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Name: gokada-prod-central-api-lb
+      SecurityGroups: !Ref SecurityGroupIDs
+      Subnets: !Ref SubnetIDs
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /api/app-health
+      Name: tg-gokada-prod-central-api-1
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      VpcId: !Ref VpcID
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "300"
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+  TargetGroupTwo:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /api/app-health
+      Name: tg-gokada-prod-central-api-2
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      VpcId: !Ref VpcID
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "300"
+  AutoScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: "15"
+      MinCapacity: "1"
+      ResourceId: service/gokada-prod-primary/gokada-prod-central-api
+      RoleARN: arn:aws:iam::525408006129:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    DependsOn:
+      - ECSService
+  AutoScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: gokada-central-target-tracking-1
+      PolicyType: TargetTrackingScaling
+      ResourceId: service/gokada-prod-primary/gokada-prod-central-api
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: "70"
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref ApplicationName
+      DeploymentGroupName: !Ref DeploymentGroupName
+      DeploymentConfigName: CodeDeployDefault.ECSAllAtOnce
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events:
+          - DEPLOYMENT_FAILURE
+          - DEPLOYMENT_STOP_ON_REQUEST
+      BlueGreenDeploymentConfiguration:
+        DeploymentReadyOption:
+          ActionOnTimeout: CONTINUE_DEPLOYMENT
+          WaitTimeInMinutes: 0
+        TerminateBlueInstancesOnDeploymentSuccess:
+          Action: TERMINATE
+          TerminationWaitTimeInMinutes: 60
+      DeploymentStyle:
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+        DeploymentType: BLUE_GREEN
+      LoadBalancerInfo:
+        TargetGroupPairInfoList:
+          - ProdTrafficRoute:
+              ListenerArns:
+                - !GetAtt Listener.ListenerArn
+            TargetGroups:
+              - Name: !GetAtt TargetGroup.TargetGroupName
+              - Name: !GetAtt TargetGroupTwo.TargetGroupName
+      ServiceRoleArn: arn:aws:iam::525408006129:role/CodeDeployServiceRole
+      ECSServices:
+        - ClusterName: !Ref ECSClusterName
+          ServiceName: !Ref ECSServiceName
+      Tags: []
+    DependsOn:
+      - CodeDeployApplication
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: !Ref ApplicationName
+      ComputePlatform: ECS
+      Tags: []
+    DependsOn:
+      - ECSService
+Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !Ref ECSClusterName
+  ECSService:
+    Description: The created service.
+    Value: !Ref ECSService
+  LoadBalancer:
+    Description: The created load balancer.
+    Value: !Ref LoadBalancer
+  Listener:
+    Description: The created listener.
+    Value: !Ref Listener
+  TargetGroup:
+    Description: The created target group.
+    Value: !Ref TargetGroup
+  CodeDeployDeploymentGroup:
+    Description: The created CodeDeploy deployment group.
+    Value: !Ref CodeDeployDeploymentGroup
+  CodeDeployApplication:
+    Description: The created CodeDeploy application.
+    Value: !Ref CodeDeployApplication
+  TargetGroupTwo:
+    Description: The created target group 2.
+    Value: !Ref TargetGroupTwo
+  AutoScalingTarget:
+    Value: !Ref AutoScalingTarget
+  AutoScalingPolicy:
+    Value: !Ref AutoScalingPolicy
