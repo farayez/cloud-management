@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  RDSSecurityGroupId:
+    Type: String
+  ECSServiceStackName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+
+Resources:
+  RDSIngressFromECSTask:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref RDSSecurityGroupId
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
+      SourceSecurityGroupId:
+        Fn::ImportValue: !Sub "${ECSServiceStackName}-TaskSG"
+      Description:
+        Fn::Sub:
+          - "Allow MySQL access from ${ECSServiceName} ECS tasks"
+          - ECSServiceName:
+              Fn::ImportValue: !Sub "${ECSServiceStackName}-ECSServiceName"
+
+Outputs:
+  RDSIngressRuleId:
+    Description: The ID of the RDS ingress rule allowing MySQL access from ECS tasks
+    Value: !Ref RDSIngressFromECSTask
+    Export:
+      Name: !Sub "${AWS::StackName}-RDSIngressRuleId"
