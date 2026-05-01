@@ -174,11 +174,22 @@ Resources:
       - Listener
 
 Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !ImportValue
+      Fn::Sub: ${ClusterStackName}-Cluster
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
+    Export:
+      Name: !Sub ${AWS::StackName}-ECSService
   TaskSecurityGroup:
     Description: The security group for the service tasks.
     Value: !Ref SecurityGroup
     Export:
       Name: !Sub ${AWS::StackName}-TaskSG
+  ECSServiceName:
+    Description: The name of the created service.
+    Value: !Ref ECSServiceName
+    Export:
+      Name: !Sub ${AWS::StackName}-ECSServiceName
