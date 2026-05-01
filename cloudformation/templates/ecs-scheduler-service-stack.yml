@@ -105,3 +105,8 @@ Outputs:
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
+  TaskSecurityGroup:
+    Description: The security group for the service tasks.
+    Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-TaskSG

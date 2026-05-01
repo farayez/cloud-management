@@ -24,8 +24,11 @@ Parameters:
     Default: /api/app-health
     MinLength: 1
     MaxLength: 255
-  CertificateArn:
+  CertificateStackName:
     Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
   AssignPublicIp:
     Type: String
     AllowedValues:
@@ -58,7 +61,8 @@ Resources:
       Port: 443
       Protocol: HTTPS
       Certificates:
-        - CertificateArn: !Sub ${CertificateArn}
+        - CertificateArn: !ImportValue
+            Fn::Sub: ${CertificateStackName}-Certificate
     DependsOn:
       - TargetGroup
 
@@ -173,3 +177,8 @@ Outputs:
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
+  TaskSecurityGroup:
+    Description: The security group for the service tasks.
+    Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-TaskSG
