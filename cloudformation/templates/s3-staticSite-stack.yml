@@ -31,7 +31,7 @@ Parameters:
   DefaultRootObject:
     Type: String
     Description: Default root object for the website
-    Default: index.html
+    Default: /index.html
 
   ErrorPagePath:
     Type: String
@@ -71,7 +71,7 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       VersioningConfiguration:
-        Status: Disabled
+        Status: Suspended
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -183,10 +183,12 @@ Resources:
         #   IncludeCookies: false
 
       Tags:
-        - Key: Purpose
-          Value: StaticWebsiteHosting
-        - Key: ManagedBy
-          Value: CloudFormation
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
 
   # Optional: S3 Bucket for CloudFront logs (uncomment if needed)
   # LoggingBucket:
