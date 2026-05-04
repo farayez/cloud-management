@@ -13,10 +13,11 @@ Parameters:
     Description: Custom domain name for the website (optional, leave empty if not using custom domain)
     Default: ""
 
-  CertificateArn:
+  CertificateStackName:
     Type: String
-    Description: ARN of ACM certificate in us-east-1 region (required if using custom domain)
+    Description: Name of the CloudFormation stack containing the ACM certificate (required if using custom domain)
     Default: ""
+    AllowedPattern: ^$|^[a-zA-Z][-a-zA-Z0-9]*$
 
   PriceClass:
     Type: String
@@ -56,7 +57,7 @@ Parameters:
 
 Conditions:
   HasCustomDomain: !Not [!Equals [!Ref DomainName, ""]]
-  HasCertificate: !Not [!Equals [!Ref CertificateArn, ""]]
+  HasCertificate: !Not [!Equals [!Ref CertificateStackName, ""]]
 
 Resources:
   # S3 Bucket for hosting static website content
@@ -134,7 +135,8 @@ Resources:
         # SSL Certificate
         ViewerCertificate: !If
           - HasCertificate
-          - AcmCertificateArn: !Ref CertificateArn
+          - AcmCertificateArn: !ImportValue
+              Fn::Sub: ${CertificateStackName}-Certificate
             MinimumProtocolVersion: TLSv1.2_2021
             SslSupportMethod: sni-only
           - CloudFrontDefaultCertificate: true
