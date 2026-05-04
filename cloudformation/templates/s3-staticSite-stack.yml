@@ -19,6 +19,11 @@ Parameters:
     Default: ""
     AllowedPattern: ^$|^[a-zA-Z][-a-zA-Z0-9]*$
 
+  HostedZoneId:
+    Type: String
+    Description: Route53 Hosted Zone ID for creating DNS record (required if using custom domain)
+    Default: ""
+
   PriceClass:
     Type: String
     Description: CloudFront price class
@@ -58,6 +63,9 @@ Parameters:
 Conditions:
   HasCustomDomain: !Not [!Equals [!Ref DomainName, ""]]
   HasCertificate: !Not [!Equals [!Ref CertificateStackName, ""]]
+  CreateRoute53Record: !And
+    - !Not [!Equals [!Ref DomainName, ""]]
+    - !Not [!Equals [!Ref HostedZoneId, ""]]
 
 Resources:
   # S3 Bucket for hosting static website content
@@ -190,6 +198,19 @@ Resources:
         - Key: env
           Value: !Ref TagEnv
 
+  # Route53 DNS Record (optional)
+  Route53Record:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateRoute53Record
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant for all CloudFront distributions)
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        EvaluateTargetHealth: false
+
   # Optional: S3 Bucket for CloudFront logs (uncomment if needed)
   # LoggingBucket:
   #   Type: AWS::S3::Bucket
@@ -246,3 +267,7 @@ Outputs:
     Value: !GetAtt CloudFrontOriginAccessControl.Id
     Export:
       Name: !Sub "${AWS::StackName}-OACId"
+
+  Route53RecordCreated:
+    Description: Whether Route53 DNS record was created
+    Value: !If [CreateRoute53Record, "Yes", "No"]
