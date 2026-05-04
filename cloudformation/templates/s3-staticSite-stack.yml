@@ -1,0 +1,244 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "CloudFormation template for hosting a static website on S3 with CloudFront distribution"
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 bucket (must be globally unique)
+    AllowedPattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+    ConstraintDescription: Bucket name must contain only lowercase letters, numbers, and hyphens
+
+  DomainName:
+    Type: String
+    Description: Custom domain name for the website (optional, leave empty if not using custom domain)
+    Default: ""
+
+  CertificateArn:
+    Type: String
+    Description: ARN of ACM certificate in us-east-1 region (required if using custom domain)
+    Default: ""
+
+  PriceClass:
+    Type: String
+    Description: CloudFront price class
+    Default: PriceClass_100
+    AllowedValues:
+      - PriceClass_100
+      - PriceClass_200
+      - PriceClass_All
+
+  DefaultRootObject:
+    Type: String
+    Description: Default root object for the website
+    Default: index.html
+
+  ErrorPagePath:
+    Type: String
+    Description: Path to custom error page
+    Default: /error.html
+
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+      - all
+  TagEnv:
+    Type: String
+    Default: ""
+    AllowedValues:
+      - production
+      - staging
+      - "" # Allows the "empty" selection
+
+Conditions:
+  HasCustomDomain: !Not [!Equals [!Ref DomainName, ""]]
+  HasCertificate: !Not [!Equals [!Ref CertificateArn, ""]]
+
+Resources:
+  # S3 Bucket for hosting static website content
+  StaticWebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Disabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+
+  # CloudFront Origin Access Control (OAC) - modern replacement for OAI
+  CloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-OAC"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # S3 Bucket Policy to allow CloudFront access
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticWebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${StaticWebsiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # CloudFront Distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Comment: !Sub "CloudFront distribution for ${BucketName}"
+        DefaultRootObject: !Ref DefaultRootObject
+        PriceClass: !Ref PriceClass
+
+        # Aliases (custom domains)
+        Aliases: !If
+          - HasCustomDomain
+          - - !Ref DomainName
+          - !Ref AWS::NoValue
+
+        # SSL Certificate
+        ViewerCertificate: !If
+          - HasCertificate
+          - AcmCertificateArn: !Ref CertificateArn
+            MinimumProtocolVersion: TLSv1.2_2021
+            SslSupportMethod: sni-only
+          - CloudFrontDefaultCertificate: true
+
+        # Origins
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt StaticWebsiteBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !GetAtt CloudFrontOriginAccessControl.Id
+
+        # Default Cache Behavior
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # CORS-S3Origin
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03 # SecurityHeadersPolicy
+
+        # Custom Error Responses
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: !Ref DefaultRootObject
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: !Ref ErrorPagePath
+            ErrorCachingMinTTL: 300
+
+        # Logging (optional - uncomment if needed)
+        # Logging:
+        #   Bucket: !GetAtt LoggingBucket.DomainName
+        #   Prefix: cloudfront-logs/
+        #   IncludeCookies: false
+
+      Tags:
+        - Key: Purpose
+          Value: StaticWebsiteHosting
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Optional: S3 Bucket for CloudFront logs (uncomment if needed)
+  # LoggingBucket:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     BucketName: !Sub '${BucketName}-logs'
+  #     PublicAccessBlockConfiguration:
+  #       BlockPublicAcls: true
+  #       BlockPublicPolicy: true
+  #       IgnorePublicAcls: true
+  #       RestrictPublicBuckets: true
+  #     LifecycleConfiguration:
+  #       Rules:
+  #         - Id: DeleteOldLogs
+  #           Status: Enabled
+  #           ExpirationInDays: 90
+  #     OwnershipControls:
+  #       Rules:
+  #         - ObjectOwnership: BucketOwnerPreferred
+
+Outputs:
+  BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref StaticWebsiteBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
+
+  BucketArn:
+    Description: ARN of the S3 bucket
+    Value: !GetAtt StaticWebsiteBucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketArn"
+
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub "${AWS::StackName}-DistributionId"
+
+  CloudFrontDomainName:
+    Description: CloudFront Distribution Domain Name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-DomainName"
+
+  WebsiteURL:
+    Description: URL of the website
+    Value: !If
+      - HasCustomDomain
+      - !Sub "https://${DomainName}"
+      - !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  OriginAccessControlId:
+    Description: CloudFront Origin Access Control ID
+    Value: !GetAtt CloudFrontOriginAccessControl.Id
+    Export:
+      Name: !Sub "${AWS::StackName}-OACId"
