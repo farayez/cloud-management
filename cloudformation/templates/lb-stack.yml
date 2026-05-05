@@ -19,9 +19,14 @@ Parameters:
       - utility
   TagEnv:
     Type: String
+    Default: ""
     AllowedValues:
       - production
       - staging
+      - "" # Allows the "empty" selection
+
+Conditions:
+  HasEnvTag: !Not [!Equals [!Ref TagEnv, ""]]
 
 Resources:
   SecurityGroup:
@@ -44,8 +49,11 @@ Resources:
           Value: !Ref TagDomain
         - Key: class
           Value: !Ref TagClass
-        - Key: env
-          Value: !Ref TagEnv
+        - !If
+          - HasEnvTag
+          - Key: env
+            Value: !Ref TagEnv
+          - !Ref AWS::NoValue
         - Key: Name
           Value: !Sub ${LoadBalancerName}-sg
       VpcId: !Ref VpcId
@@ -64,8 +72,11 @@ Resources:
           Value: !Ref TagDomain
         - Key: class
           Value: !Ref TagClass
-        - Key: env
-          Value: !Ref TagEnv
+        - !If
+          - HasEnvTag
+          - Key: env
+            Value: !Ref TagEnv
+          - !Ref AWS::NoValue
       Type: application
 
 Outputs:
