@@ -102,3 +102,13 @@ Outputs:
       - !Ref SubnetIds
     Export:
       Name: !Sub ${AWS::StackName}-Subnets
+  LoadBalancerDNSName:
+    Description: DNS Name of the load balancer
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Sub ${AWS::StackName}-LoadBalancerDNSName
+  LoadBalancerHostedZoneId:
+    Description: Canonical hosted zone ID of the load balancer
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: !Sub ${AWS::StackName}-LoadBalancerHostedZoneId
