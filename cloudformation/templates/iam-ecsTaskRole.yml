@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  RoleName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "255"
+    AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
+  SqsQueueArn:
+    Type: String
+    Default: ""
+    Description: "Optional SQS Queue ARN. If provided, the role will have permissions to interact with this queue."
+  TagDomain:
+    Type: String
+  TagClass:
+    Type: String
+    AllowedValues:
+      - primary
+      - secondary
+      - utility
+      - all
+  TagEnv:
+    Type: String
+    AllowedValues:
+      - production
+      - staging
+      - all
+
+Conditions:
+  HasSqsQueue: !Not [!Equals [!Ref SqsQueueArn, ""]]
+
+Resources:
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${RoleName}-ssm-exec-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssmmessages:CreateControlChannel
+                  - ssmmessages:CreateDataChannel
+                  - ssmmessages:OpenControlChannel
+                  - ssmmessages:OpenDataChannel
+                Resource: "*"
+        - !If
+          - HasSqsQueue
+          - PolicyName: !Sub "${RoleName}-sqs-policy"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:DeleteMessage
+                    - sqs:ChangeMessageVisibility
+                    - sqs:ReceiveMessage
+                    - sqs:SendMessage
+                    - sqs:GetQueueAttributes
+                  Resource: !Ref SqsQueueArn
+          - !Ref AWS::NoValue
+      Tags:
+        - Key: domain
+          Value: !Ref TagDomain
+        - Key: class
+          Value: !Ref TagClass
+        - Key: env
+          Value: !Ref TagEnv
+
+Outputs:
+  RoleArn:
+    Description: ARN of the ECS Task Role
+    Value: !GetAtt ECSTaskRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-RoleArn"
+  RoleName:
+    Description: Name of the ECS Task Role
+    Value: !Ref RoleName
+    Export:
+      Name: !Sub "${AWS::StackName}-RoleName"
