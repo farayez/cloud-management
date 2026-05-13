@@ -2,21 +2,10 @@
 
 . ./utils/pre_execution.sh
 
-fn_validate_variables resource_name root_directory aws_region stack_name
+fn_validate_variables resource_name root_directory aws_region stack_name template_filename
 
 # Prepare cloudformation template file
-if [ -z "$template_filename" ]; then
-    template_file=$root_directory/cloudformation/templates/$resource_name.yml
-else
-    template_file=$root_directory/cloudformation/templates/$template_filename
-fi
-
-# Prepare parameter file
-if [ -z "$parameter_filename" ]; then
-    parameter_file=$root_directory/cloudformation/parameters/$resource_name.json
-else
-    parameter_file=$root_directory/cloudformation/parameters/$parameter_filename
-fi
+template_file=$root_directory/cloudformation/templates/$template_filename
 
 # Ensure cloudformation template file exists
 if [ ! -f "$template_file" ]; then
@@ -25,6 +14,20 @@ if [ ! -f "$template_file" ]; then
 fi
 
 fn_info "Using cloudformation template file: $template_file"
+
+# Prepare parameter file directory
+if [ -z "$cf_parameter_file_directory" ]; then
+    parameter_file_full_directory=$root_directory/cloudformation/parameters
+else
+    parameter_file_full_directory=$root_directory/$cf_parameter_file_directory
+fi
+
+# Prepare parameter file
+if [ -z "$parameter_filename" ]; then
+    parameter_file=$parameter_file_full_directory/$resource_name.json
+else
+    parameter_file=$parameter_file_full_directory/$parameter_filename
+fi
 
 # Check if parameter file exists and prepare parameters option
 parameters_option=""
