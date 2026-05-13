@@ -228,6 +228,8 @@ Outputs:
     Description: The cluster used to create the service.
     Value: !ImportValue
       Fn::Sub: ${ClusterStackName}-Cluster
+    Export:
+      Name: !Sub ${AWS::StackName}-ClusterName
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
