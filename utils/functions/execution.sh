@@ -4,9 +4,17 @@ function fn_parse_arguments() {
     local argument
     for argument in "$@"; do
         local key=$(echo $argument | cut -f1 -d=)
+        
+        # Strip leading -- from key if present
+        key=${key#--}
 
-        local key_length=${#key}
-        local value="${argument:$key_length+1}"
+        local key_length=${#argument}
+        local value_start=$((${#key} + 1))
+        # Add 2 if original had -- prefix
+        if [[ $argument == --* ]]; then
+            value_start=$((value_start + 2))
+        fi
+        local value="${argument:$value_start}"
 
         if [ ! -z $value ]; then
             export "$key"="$value"
