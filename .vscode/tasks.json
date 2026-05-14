@@ -259,7 +259,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "cloudformation:create_stack", "${input:cfStackPicker}"],
+      "args": [
+        "run",
+        "cloudformation:create_stack",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:cfStackPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -365,7 +370,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which CloudFormation Stack?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.cloudformation[__itemIdx__ ].name"
       }

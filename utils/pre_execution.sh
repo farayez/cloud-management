@@ -5,7 +5,8 @@
 # Populate execution variables
 fn_populate_and_validate_resource_tag_from_current_script_name
 fn_populate_and_validate_resource_directory_from_resource_tag
-fn_populate_and_validate_resource_name $1
+fn_parse_arguments "$@" || fn_fatal
+fn_populate_and_validate_resource_name "$resource"
 
 # Parse resource configuration and command arguments
 resource_config_path=${resource_tag_to_directory_map[$resource_tag]}
