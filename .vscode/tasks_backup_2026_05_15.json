@@ -1,0 +1,522 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Initialize Resource",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "resource:init"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Resource"
+      }
+    },
+    {
+      "label": "Clear Resource History",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "resource:clear_history"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Resource"
+      }
+    },
+    {
+      "label": "Push Image",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "image:push", "${input:imagePicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Image"
+      }
+    },
+    {
+      "label": "Start Service",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ecs:start_service", "${input:servicePicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
+      }
+    },
+    {
+      "label": "Stop Service",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ecs:stop_service", "${input:servicePicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
+      }
+    },
+    {
+      "label": "Redeploy Service",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ecs:redeploy_service", "${input:servicePicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Service"
+      }
+    },
+    {
+      "label": "Exec into Container",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ecs:exec_container", "${input:servicePicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
+      "label": "SSH into Server",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "server:ssh", "${input:serverPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
+      "label": "Copy to Server",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "server:copy", "${input:serverPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
+      "label": "Update Service",
+      "type": "shell",
+      "command": "./update-service.sh",
+      "problemMatcher": [],
+      "args": [
+        "${input:servicePicker}",
+        "task_definition_revision=${input:taskDefinitionRevision}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
+      }
+    },
+    {
+      "label": "Pull Parameter",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ssm_parameter:pull", "${input:parameterPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
+      }
+    },
+    {
+      "label": "Push Parameter",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "ssm_parameter:push", "${input:parameterPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
+      }
+    },
+    {
+      "label": "Deploy To S3",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "s3:deploy", "${input:s3-application-picker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "S3"
+      }
+    },
+    {
+      "label": "Invalidate CloudFront Distribution",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "cloudfront:invalidate", "${input:cloudfront-picker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Cloudfront"
+      }
+    },
+    {
+      "label": "Validate Task Definition",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": [
+        "run",
+        "task_definition:validate",
+        "${input:taskDefinitionPicker}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task Definition"
+      }
+    },
+    {
+      "label": "Register Task Definition",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": [
+        "run",
+        "task_definition:register",
+        "${input:taskDefinitionPicker}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task Definition"
+      }
+    },
+    {
+      "label": "Create CloudFormation Stack",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "cloudformation:create_stack", "${input:cfStackPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "CloudFormation"
+      }
+    },
+    {
+      "label": "Update CloudFormation Stack",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": ["run", "cloudformation:update_stack", "${input:cfStackPicker}"],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "CloudFormation"
+      }
+    },
+    {
+      "label": "Test Integration",
+      "type": "shell",
+      "command": "./test.sh",
+      "problemMatcher": [],
+      "args": ["${input:service}", "${input:testCommand}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "View Variables",
+      "type": "shell",
+      "command": "./view-variables.sh",
+      "problemMatcher": [],
+      "args": ["${input:service}"],
+      "presentation": {
+        "showReuseMessage": false
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "servicePicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Service?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.service[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "serverPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Server?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.server[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "parameterPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Parameter?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.ssm_parameter[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "imagePicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Image?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.image[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "taskDefinitionPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Task Definition?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.task_definition[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "cfStackPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which CloudFormation Stack?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.cloudformation[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "service",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Service?",
+        "include": "services/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedService"
+      }
+    },
+    {
+      "id": "image",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Image?",
+        "include": "images/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedImage"
+      }
+    },
+    {
+      "id": "ssm-parameter",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Parametr?",
+        "include": "ssm_parameters/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedParameter"
+      }
+    },
+    {
+      "id": "s3-application-picker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Service?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.s3_application[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "cloudfront-picker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which CloudFront Distribution?",
+        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileFormat": "json",
+        "jsonOption": "content.cloudfront[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "task-definition",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "description": "Which Parametr?",
+        "include": "task_definitions/*.config.sh",
+        "valueTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "labelTransform": {
+          "text": "${fileBasename}",
+          "find": ".config.sh",
+          "replace": ""
+        },
+        "display": "transform",
+        "showDirs": false,
+        "keyRemember": "selectedParameter"
+      }
+    },
+    {
+      "id": "testCommand",
+      "type": "promptString",
+      "default": "aws sts get-caller-identity",
+      "description": "Command to execute"
+    },
+    {
+      "id": "desiredCount",
+      "type": "promptString",
+      "default": "1",
+      "description": "Desired task count in service"
+    },
+    {
+      "id": "taskDefinitionRevision",
+      "type": "promptString",
+      "default": "",
+      "description": "Task definition revision"
+    }
+  ]
+}
