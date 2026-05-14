@@ -78,7 +78,7 @@ function fn_populate_and_validate_resource_name() {
 
     # Validate resource_name argument
     if [ -z $resource_name ]; then
-        fn_error "1st argument must be the name of the $resource_tag"
+        fn_error "resource argument must be populated"
         fn_fatal
     fi
 
