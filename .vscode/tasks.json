@@ -289,6 +289,22 @@
   ],
   "inputs": [
     {
+      "id": "configurationFilePicker",
+      "type": "command",
+      "command": "extension.commandvariable.file.pickFile",
+      "args": {
+        "keyRemember": "selectedConfigFile",
+        "include": "configurations/*.config.json",
+        "display": "transform",
+        "valueTransform": {
+          "text": "${fileBasename}"
+        },
+        "labelTransform": {
+          "text": "${fileBasename}"
+        }
+      }
+    },
+    {
       "id": "servicePicker",
       "type": "command",
       "command": "extension.commandvariable.pickStringRemember",
