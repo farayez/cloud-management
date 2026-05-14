@@ -4,22 +4,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Initialize Resource",
-      "type": "shell",
-      "command": "npm",
-      "problemMatcher": [],
-      "args": ["run", "resource:init"],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false,
-        "echo": false,
-        "group": "Resource"
-      }
-    },
-    {
       "label": "Clear Resource History",
       "type": "shell",
       "command": "npm",
@@ -100,6 +84,25 @@
       }
     },
     {
+      "label": "Update Service",
+      "type": "shell",
+      "command": "./update-service.sh",
+      "problemMatcher": [],
+      "args": [
+        "${input:servicePicker}",
+        "task_definition_revision=${input:taskDefinitionRevision}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "SSM Parameter"
+      }
+    },
+    {
       "label": "Exec into Container",
       "type": "shell",
       "command": "npm",
@@ -145,25 +148,6 @@
         "clear": false,
         "echo": false,
         "group": "Task"
-      }
-    },
-    {
-      "label": "Update Service",
-      "type": "shell",
-      "command": "./update-service.sh",
-      "problemMatcher": [],
-      "args": [
-        "${input:servicePicker}",
-        "task_definition_revision=${input:taskDefinitionRevision}"
-      ],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false,
-        "echo": false,
-        "group": "SSM Parameter"
       }
     },
     {
@@ -301,26 +285,6 @@
         "echo": false,
         "group": "CloudFormation"
       }
-    },
-    {
-      "label": "Test Integration",
-      "type": "shell",
-      "command": "./test.sh",
-      "problemMatcher": [],
-      "args": ["${input:service}", "${input:testCommand}"],
-      "presentation": {
-        "showReuseMessage": false
-      }
-    },
-    {
-      "label": "View Variables",
-      "type": "shell",
-      "command": "./view-variables.sh",
-      "problemMatcher": [],
-      "args": ["${input:service}"],
-      "presentation": {
-        "showReuseMessage": false
-      }
     }
   ],
   "inputs": [
@@ -388,28 +352,6 @@
         "fileName": "${workspaceFolder}/configurations/default.config.json",
         "fileFormat": "json",
         "jsonOption": "content.cloudformation[__itemIdx__ ].name"
-      }
-    },
-    {
-      "id": "service",
-      "type": "command",
-      "command": "extension.commandvariable.file.pickFile",
-      "args": {
-        "description": "Which Service?",
-        "include": "services/*.config.sh",
-        "valueTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "labelTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "display": "transform",
-        "showDirs": false,
-        "keyRemember": "selectedService"
       }
     },
     {
@@ -499,12 +441,6 @@
         "showDirs": false,
         "keyRemember": "selectedParameter"
       }
-    },
-    {
-      "id": "testCommand",
-      "type": "promptString",
-      "default": "aws sts get-caller-identity",
-      "description": "Command to execute"
     },
     {
       "id": "desiredCount",
