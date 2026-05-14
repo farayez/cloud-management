@@ -24,7 +24,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "image:push", "${input:imagePicker}"],
+      "args": [
+        "run",
+        "image:push",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:imagePicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -40,7 +45,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ecs:start_service", "${input:servicePicker}"],
+      "args": [
+        "run",
+        "ecs:start_service",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:servicePicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -56,7 +66,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ecs:stop_service", "${input:servicePicker}"],
+      "args": [
+        "run",
+        "ecs:stop_service",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:servicePicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -72,7 +87,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ecs:redeploy_service", "${input:servicePicker}"],
+      "args": [
+        "run",
+        "ecs:redeploy_service",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:servicePicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -84,30 +104,16 @@
       }
     },
     {
-      "label": "Update Service",
-      "type": "shell",
-      "command": "./update-service.sh",
-      "problemMatcher": [],
-      "args": [
-        "${input:servicePicker}",
-        "task_definition_revision=${input:taskDefinitionRevision}"
-      ],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false,
-        "echo": false,
-        "group": "SSM Parameter"
-      }
-    },
-    {
       "label": "Exec into Container",
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ecs:exec_container", "${input:servicePicker}"],
+      "args": [
+        "run",
+        "ecs:exec_container",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:servicePicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -123,7 +129,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "server:ssh", "${input:serverPicker}"],
+      "args": [
+        "run",
+        "server:ssh",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:serverPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -139,7 +150,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "server:copy", "${input:serverPicker}"],
+      "args": [
+        "run",
+        "server:copy",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:serverPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -155,7 +171,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ssm_parameter:pull", "${input:parameterPicker}"],
+      "args": [
+        "run",
+        "ssm_parameter:pull",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:parameterPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -171,7 +192,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "ssm_parameter:push", "${input:parameterPicker}"],
+      "args": [
+        "run",
+        "ssm_parameter:push",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:parameterPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -187,7 +213,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "s3:deploy", "${input:s3-application-picker}"],
+      "args": [
+        "run",
+        "s3:deploy",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:s3-application-picker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -203,7 +234,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "cloudfront:invalidate", "${input:cloudfront-picker}"],
+      "args": [
+        "run",
+        "cloudfront:invalidate",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:cloudfront-picker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -222,7 +258,8 @@
       "args": [
         "run",
         "task_definition:validate",
-        "${input:taskDefinitionPicker}"
+        "config=${input:configurationFilePicker}",
+        "resource=${input:taskDefinitionPicker}"
       ],
       "presentation": {
         "reveal": "always",
@@ -242,7 +279,8 @@
       "args": [
         "run",
         "task_definition:register",
-        "${input:taskDefinitionPicker}"
+        "config=${input:configurationFilePicker}",
+        "resource=${input:taskDefinitionPicker}"
       ],
       "presentation": {
         "reveal": "always",
@@ -280,7 +318,12 @@
       "type": "shell",
       "command": "npm",
       "problemMatcher": [],
-      "args": ["run", "cloudformation:update_stack", "${input:cfStackPicker}"],
+      "args": [
+        "run",
+        "cloudformation:update_stack",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:cfStackPicker}"
+      ],
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -315,7 +358,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Service?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.service[__itemIdx__ ].name"
       }
@@ -326,7 +369,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Server?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.server[__itemIdx__ ].name"
       }
@@ -337,7 +380,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Parameter?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.ssm_parameter[__itemIdx__ ].name"
       }
@@ -348,7 +391,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Image?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.image[__itemIdx__ ].name"
       }
@@ -359,7 +402,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Task Definition?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.task_definition[__itemIdx__ ].name"
       }
@@ -425,7 +468,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Service?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.s3_application[__itemIdx__ ].name"
       }
@@ -436,7 +479,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which CloudFront Distribution?",
-        "fileName": "${workspaceFolder}/configurations/default.config.json",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.cloudfront[__itemIdx__ ].name"
       }
