@@ -9,6 +9,14 @@ Parameters:
   LoadBalancerName:
     Type: String
     Description: Name of the Load Balancer
+  HostedZoneId:
+    Type: String
+    Description: Route53 Hosted Zone ID for creating DNS record (required if using custom domain)
+    Default: ""
+  DomainName:
+    Type: String
+    Description: Custom domain name for the service (optional, leave empty if not using custom domain)
+    Default: ""
   TagDomain:
     Type: String
   TagClass:
@@ -27,6 +35,9 @@ Parameters:
 
 Conditions:
   HasEnvTag: !Not [!Equals [!Ref TagEnv, ""]]
+  CreateRoute53Record: !And
+    - !Not [!Equals [!Ref DomainName, ""]]
+    - !Not [!Equals [!Ref HostedZoneId, ""]]
 
 Resources:
   SecurityGroup:
@@ -78,6 +89,18 @@ Resources:
             Value: !Ref TagEnv
           - !Ref AWS::NoValue
       Type: application
+
+  Route53Record:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateRoute53Record
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+        DNSName: !GetAtt LoadBalancer.DNSName
+        EvaluateTargetHealth: false
 
 Outputs:
   SecurityGroups:
