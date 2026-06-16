@@ -38,8 +38,6 @@ else
     fn_info "No parameter file found, proceeding without parameters"
 fi
 
-# exit 1
-
 fn_run create-cf-stack \
     --stack-name $stack_name \
     --region $aws_region \
