@@ -8,55 +8,33 @@ Parameters:
     MaxLength: "255"
     AllowedPattern: ^[a-zA-Z][-a-zA-Z0-9]*$
     Description: Name of the CloudFormation stack that created the ECS service
-
   MinCapacity:
     Type: Number
     Default: 1
     MinValue: 0
     Description: Minimum number of tasks
-
   MaxCapacity:
     Type: Number
     Default: 10
     MinValue: 1
     Description: Maximum number of tasks
-
-  EnableCPUScaling:
-    Type: String
-    Default: "true"
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: Enable CPU-based autoscaling
-
   CPUTargetValue:
     Type: Number
-    Default: 70
-    MinValue: 1
+    Default: 0
+    MinValue: 0
     MaxValue: 100
-    Description: Target CPU utilization percentage (only used if EnableCPUScaling is true)
-
-  EnableMemoryScaling:
-    Type: String
-    Default: "false"
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: Enable memory-based autoscaling
-
+    Description: Target CPU utilization percentage (only used if CPUTargetValue is greater than 0)
   MemoryTargetValue:
     Type: Number
-    Default: 80
-    MinValue: 1
+    Default: 0
+    MinValue: 0
     MaxValue: 100
-    Description: Target memory utilization percentage (only used if EnableMemoryScaling is true)
-
+    Description: Target memory utilization percentage (only used if MemoryTargetValue is greater than 0)
   ScaleInCooldown:
     Type: Number
     Default: 300
     MinValue: 0
     Description: Cooldown period (in seconds) after a scale-in activity
-
   ScaleOutCooldown:
     Type: Number
     Default: 60
@@ -64,8 +42,8 @@ Parameters:
     Description: Cooldown period (in seconds) after a scale-out activity
 
 Conditions:
-  ShouldEnableCPUScaling: !Equals [!Ref EnableCPUScaling, "true"]
-  ShouldEnableMemoryScaling: !Equals [!Ref EnableMemoryScaling, "true"]
+  ShouldEnableCPUScaling: !Not [!Equals [!Ref CPUTargetValue, 0]]
+  ShouldEnableMemoryScaling: !Not [!Equals [!Ref MemoryTargetValue, 0]]
 
 Resources:
   ScalableTarget:
