@@ -24,6 +24,18 @@ Parameters:
     MinValue: 0
     MaxValue: 100
     Description: Target CPU utilization percentage (only used if CPUTargetValue is greater than 0)
+  MaxCPUTargetValue:
+    Type: Number
+    Default: 0
+    MinValue: 0
+    MaxValue: 100
+    Description: Target Max CPU utilization percentage (only used if MaxCPUTargetValue is greater than 0)
+  MaxCPUStepScalingAdjustment:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 5
+    Description: Number of tasks to add when max CPU step scaling is triggered
   MemoryTargetValue:
     Type: Number
     Default: 0
@@ -43,6 +55,7 @@ Parameters:
 
 Conditions:
   ShouldEnableCPUScaling: !Not [!Equals [!Ref CPUTargetValue, 0]]
+  ShouldEnableMaxCPUScaling: !Not [!Equals [!Ref MaxCPUTargetValue, 0]]
   ShouldEnableMemoryScaling: !Not [!Equals [!Ref MemoryTargetValue, 0]]
 
 Resources:
@@ -78,6 +91,50 @@ Resources:
         ScaleInCooldown: !Ref ScaleInCooldown
         ScaleOutCooldown: !Ref ScaleOutCooldown
 
+  MaxCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: ShouldEnableMaxCPUScaling
+    Properties:
+      AlarmName: !Sub
+        - ${ServiceName}-max-cpu-alarm
+        - ServiceName: !ImportValue
+            Fn::Sub: ${ServiceStackName}-ECSServiceName
+      AlarmDescription: Triggers step scaling when max CPU utilization reaches threshold
+      Namespace: AWS/ECS
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: ClusterName
+          Value: !ImportValue
+            Fn::Sub: ${ServiceStackName}-ClusterName
+        - Name: ServiceName
+          Value: !ImportValue
+            Fn::Sub: ${ServiceStackName}-ECSServiceName
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: !Ref MaxCPUTargetValue
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref MaxCPUScalingPolicy
+
+  MaxCPUScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Condition: ShouldEnableMaxCPUScaling
+    Properties:
+      PolicyName: !Sub
+        - ${ServiceName}-max-cpu-scaling
+        - ServiceName: !ImportValue
+            Fn::Sub: ${ServiceStackName}-ECSServiceName
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref ScalableTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 300
+        MetricAggregationType: Maximum
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: !Ref MaxCPUStepScalingAdjustment
+
   MemoryScalingPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Condition: ShouldEnableMemoryScaling
@@ -108,6 +165,13 @@ Outputs:
     Value: !Ref CPUScalingPolicy
     Export:
       Name: !Sub ${AWS::StackName}-CPUPolicy
+
+  MaxCPUPolicyArn:
+    Description: ARN of the max CPU step scaling policy (if enabled)
+    Condition: ShouldEnableMaxCPUScaling
+    Value: !Ref MaxCPUScalingPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-MaxCPUPolicy
 
   MemoryPolicyArn:
     Description: ARN of the memory scaling policy (if enabled)
