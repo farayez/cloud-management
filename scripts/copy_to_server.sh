@@ -7,8 +7,21 @@ fn_validate_variables host username key_path local_directory_path remote_directo
 # Set permissions for the SSH key to be read-only by the user
 chmod 400 $root_directory/$key_path
 
-scp -i $root_directory/$key_path \
-    -r $root_directory/$local_directory_path \
-    $username@$host:$remote_directory || fn_fatal "Failed to copy files to server"
+# Ensure remote directory exists
+ssh -i $root_directory/$key_path $username@$host "mkdir -p $remote_directory" || fn_fatal "Failed to create remote directory"
+
+if [ -f "$root_directory/$local_directory_path" ]; then
+    echo "Copying file $root_directory/$local_directory_path to $username@$host:$remote_directory/"
+    # It's a file, copy it to the remote directory
+    scp -i $root_directory/$key_path \
+        $root_directory/$local_directory_path \
+        $username@$host:$remote_directory/ || fn_fatal "Failed to copy files to server"
+else
+    echo "Copying directory $root_directory/$local_directory_path to $username@$host:$remote_directory/"
+    # It's a directory, copy its contents to the remote directory
+    scp -i $root_directory/$key_path \
+        -r $root_directory/$local_directory_path/* \
+        $username@$host:$remote_directory/ || fn_fatal "Failed to copy files to server"
+fi
 
 fn_success "Files copied to server successfully"
