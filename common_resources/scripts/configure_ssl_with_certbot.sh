@@ -84,8 +84,8 @@ fi
 # 2. Stop running containers and clear old data
 echo "Stopping existing containers and wiping old certs..."
 docker compose down
-rm -strict -rf "$CERTBOT_CONF_DIR"/* 2>/dev/null || true
-rm -strict -rf "$CERTBOT_WWW_DIR"/* 2>/dev/null || true
+rm -rf "$CERTBOT_CONF_DIR"/* 2>/dev/null || true
+rm -rf "$CERTBOT_WWW_DIR"/* 2>/dev/null || true
 
 # 3. Create dummy certificates so Nginx doesn't crash on startup
 echo "Creating dummy certificates for ${PRIMARY_DOMAIN}..."
