@@ -154,7 +154,30 @@
         "run",
         "server:copy",
         "config=${input:configurationFilePicker}",
-        "resource=${input:serverPicker}"
+        "resource=${input:serverPicker}",
+        "item=${input:serverResourceItemPicker}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "Task"
+      }
+    },
+    {
+      "label": "Run Command in Server",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": [
+        "run",
+        "server:run_command",
+        "config=${input:configurationFilePicker}",
+        "resource=${input:serverPicker}",
+        "item=${input:serverCommandItemPicker}"
       ],
       "presentation": {
         "reveal": "always",
@@ -369,9 +392,34 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Server?",
+        "key": "selectedServer",
         "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
         "fileFormat": "json",
         "jsonOption": "content.server[__itemIdx__ ].name"
+      }
+    },
+    {
+      "id": "serverResourceItemPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Resource?",
+        "key": "selectedServerResourceItem",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileFormat": "json",
+        "jsonOption": "content.server.find(s => s.name === '${remember:selectedServer}').resources[__itemIdx__].name"
+      }
+    },
+    {
+      "id": "serverCommandItemPicker",
+      "type": "command",
+      "command": "extension.commandvariable.pickStringRemember",
+      "args": {
+        "description": "Which Command?",
+        "key": "selectedServerCommandItem",
+        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileFormat": "json",
+        "jsonOption": "content.server.find(s => s.name === '${remember:selectedServer}').commands[__itemIdx__].name"
       }
     },
     {
