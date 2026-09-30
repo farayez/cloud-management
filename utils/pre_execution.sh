@@ -9,6 +9,7 @@ fn_populate_and_validate_resource_directory_from_resource_tag
 # Parse command arguments
 fn_parse_arguments "$@" || fn_fatal
 fn_populate_and_validate_resource_name "$resource"
+fn_run_for_each_sub_resource "$@"
 fn_populate_config_variables
 
 # Set AWS Configuration Env Variables

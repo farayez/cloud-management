@@ -89,6 +89,28 @@ function fn_populate_and_validate_resource_name() {
     # fi
 }
 
+# Re-run the current script once per sub-resource entry when no item is given
+function fn_run_for_each_sub_resource() {
+    local sub_array_key="${script_name_to_sub_resource_array_map[$current_script_name]}"
+    if [ -z "$sub_array_key" ] || [ -n "$item" ]; then
+        return
+    fi
+
+    local config_file="${config:-default.config.json}"
+    local item_names=$(jq -r --arg tag "$resource_tag" --arg name "$resource_name" --arg key "$sub_array_key" \
+        '.[$tag][] | select(.name == $name) | (.[$key] // [])[].name' "$root_directory/configurations/$config_file")
+
+    if [ -z "$item_names" ]; then
+        fn_fatal "No $sub_array_key found for $resource_tag $resource_name"
+    fi
+
+    local item_name
+    while IFS= read -r item_name; do
+        "$0" "$@" "item=$item_name" || exit 1
+    done <<< "$item_names"
+    exit 0
+}
+
 function fn_populate_and_validate_resource_config_file() {
     resource_config_file="$resource_directory/$resource_name.config.sh"
 }

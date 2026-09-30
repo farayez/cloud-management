@@ -33,6 +33,10 @@ declare -A script_name_to_resource_tag_map=(
     ["copy_to_server"]="server"
 )
 
+declare -A script_name_to_sub_resource_array_map=(
+    ["copy_to_server"]="resources"
+)
+
 declare -A script_name_to_parameter_map=(
     ["push_image"]=""
 )

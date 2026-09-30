@@ -11,6 +11,15 @@ function fn_populate_config_variables() {
     # Populate resource level config variables
     local resource_content=$(echo $config_file_content | jq -r --arg path "$resource_tag" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
     fn_populate_config_variables_from_json "$resource_content"
+
+    # Populate sub-resource level config variables for the selected item
+    local sub_array_key="${script_name_to_sub_resource_array_map[$current_script_name]}"
+    if [ -n "$sub_array_key" ] && [ -n "$item" ]; then
+        local item_content=$(echo "$resource_content" | jq -c --arg key "$sub_array_key" --arg item "$item" \
+            '(.[$key] // [])[] | select(.name == $item) | {config: del(.name)}')
+        [ -z "$item_content" ] && fn_fatal "No $sub_array_key entry found with name $item"
+        fn_populate_config_variables_from_json "$item_content"
+    fi
 }
 
 function fn_populate_config_variables_from_json() {
