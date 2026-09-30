@@ -467,50 +467,6 @@
       }
     },
     {
-      "id": "image",
-      "type": "command",
-      "command": "extension.commandvariable.file.pickFile",
-      "args": {
-        "description": "Which Image?",
-        "include": "images/*.config.sh",
-        "valueTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "labelTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "display": "transform",
-        "showDirs": false,
-        "keyRemember": "selectedImage"
-      }
-    },
-    {
-      "id": "ssm-parameter",
-      "type": "command",
-      "command": "extension.commandvariable.file.pickFile",
-      "args": {
-        "description": "Which Parametr?",
-        "include": "ssm_parameters/*.config.sh",
-        "valueTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "labelTransform": {
-          "text": "${fileBasename}",
-          "find": ".config.sh",
-          "replace": ""
-        },
-        "display": "transform",
-        "showDirs": false,
-        "keyRemember": "selectedParameter"
-      }
-    },
-    {
       "id": "s3-application-picker",
       "type": "command",
       "command": "extension.commandvariable.pickStringRemember",
