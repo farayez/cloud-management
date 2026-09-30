@@ -64,6 +64,8 @@ declare -A command_map=(
     ["invalidate-cloudfront"]="aws cloudfront create-invalidation,--unbuffered-echo"
     ["bash"]="bash -c,--unbuffered-echo"
     ["git"]="git"
+    ["ssh"]="ssh"
+    ["scp"]="scp"
 )
 
 # Define Console Color constants
