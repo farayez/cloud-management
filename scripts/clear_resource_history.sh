@@ -2,55 +2,43 @@
 
 . ./utils/prepare_runtime.sh
 
-# Get user input for resource type
-options=("${!resource_tag_to_directory_map[@]}" "\u2606 ALL \u2606")
-fn_choose_from_menu "Delete history for resource type:" resource_tag "${options[@]}"
+# History layout: history/<config_name>/<resource_tag>/<resource_name>/
+history_directory="$root_directory/history"
+all_option=$'\u2606 ALL \u2606'
 
-if [ "$resource_tag" = $'\u2606 ALL \u2606' ]; then
-    for resource_tag in "${!resource_tag_to_directory_map[@]}"; do
-        # Remove history for all resources of resource_tag
-        fn_populate_and_validate_resource_directory_from_resource_tag
-        if [ ! -d $resource_directory/history ]; then
-            fn_error "No history found for $resource_tag"
-        else
-            rm -r $resource_directory/history || fn_fatal
-            fn_info "All histories removed from $resource_tag"
-        fi
-    done
+# Delete the selected directory, or every subdirectory of $target_directory when ALL is chosen
+fn_clear_history() {
+    local description="$1"
+    if [ "$selection" = "$all_option" ]; then
+        find "$target_directory" -mindepth 1 -maxdepth 1 -type d -exec rm -r {} + || fn_fatal
+    else
+        rm -r "$target_directory/$selection" || fn_fatal
+        description="$description/$selection"
+    fi
 
+    # Drop parent directories left empty by the deletion
+    find "$history_directory" -mindepth 1 -type d -empty -delete
+
+    fn_info "\nAll histories removed for ${description:-all configurations}"
     fn_success "History cleanup complete"
-fi
+}
 
-fn_populate_and_validate_resource_directory_from_resource_tag
+target_directory="$history_directory"
+description=""
+for level in "configuration" "resource type" "resource"; do
+    mapfile -t subdirectories < <(find "$target_directory" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort)
 
-# Get user input for name of resource
-options=($(fn_get_all_resource_names_in_directory "$resource_directory") "\u2606 ALL \u2606")
-
-if [ ${#options[@]} -lt 2 ]; then
-    fn_error "No $resource_tag found"
-    fn_halt "No Action Taken"
-fi
-
-fn_choose_from_menu "Select resource:" resource_name "${options[@]}"
-
-if [ "$resource_name" = $'\u2606 ALL \u2606' ]; then
-    # Remove history for all resources of resource_tag
-    if [ ! -d $resource_directory/history ]; then
-        fn_error "No history found for $resource_tag"
+    if [ ${#subdirectories[@]} -eq 0 ]; then
+        fn_error "No history found${description:+ for ${description#/}}"
         fn_halt "No Action Taken"
     fi
-    rm -r $resource_directory/history || fn_fatal
 
-    fn_info "\nAll histories removed from $resource_tag"
-    fn_success "History cleanup complete"
-fi
+    fn_choose_from_menu "Delete history for $level:" selection "${subdirectories[@]}" "$all_option"
 
-# Remove history for resource
-if [ ! -d $resource_directory/history/$resource_name ]; then
-    fn_error "No history found for $resource_tag $resource_name"
-    fn_halt "No Action Taken"
-fi
-rm -r $resource_directory/history/$resource_name || fn_fatal
+    if [ "$selection" = "$all_option" ] || [ "$level" = "resource" ]; then
+        fn_clear_history "${description#/}"
+    fi
 
-fn_info "\nAll histories removed for $resource_tag $resource_name"
-fn_success "History cleanup complete"
+    target_directory="$target_directory/$selection"
+    description="$description/$selection"
+done
