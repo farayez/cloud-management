@@ -1,128 +1,91 @@
 # cloud-management
 
-A compilation of scripts to deploy, configure, and manage services on the cloud.
+Bash scripts to deploy, configure, and manage AWS resources from a single JSON configuration.
 
-# Requirements
+> Under development. AWS only. Tested with Bash only.
 
-- [Install the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- https://marketplace.visualstudio.com/items?itemName=rioj7.command-variable
-- https://marketplace.visualstudio.com/items?itemName=seunlanlege.action-buttons
+## Requirements
 
-# Disclaimers
-
-- Project currently under development.
-- Supports AWS exclusively.
-- Scripts have been tested exclusively using the Bash shell.
-
-# Usage
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), `jq`, `git`, Docker (for images)
+- VS Code extensions (optional, for tasks): [Command Variable](https://marketplace.visualstudio.com/items?itemName=rioj7.command-variable), [Action Buttons](https://marketplace.visualstudio.com/items?itemName=seunlanlege.action-buttons)
 
 ## Setup
 
-- Initialize a resource by running command `npm run resource:init`
-  1. Select the resource to initialize.
-  2. Input the resource name. Rest of the document will refer to this name using `<resource-name>`
-- A config file will be generated inside the resource directory. Populate the config file with appropriate values.
-- Make a copy of `.aws/config.example` and `.aws/credentials.example`. Name the new files `config` and `credentials` respectively.
-- Populate newly created `.aws/config` and `.aws/credentials` files with configurations from AWS. Follow the format from [Authenticate with short-term credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-short-term.html)
-- The AWS Profile configured in `.aws/config` and `.aws/credentials` files can be used in 2 ways:
-  - By passing argument `aws_profile=<custom-profile>` with the command.
-  - By adding `aws_profile="<custom-profile>"` in resource specific configuration file.
+1. Copy `.aws/config.example` and `.aws/credentials.example` to `.aws/config` and `.aws/credentials`, then fill them in ([format](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-short-term.html)).
+2. Run `npm run resource:init` and follow the prompts to:
+   - clone a repo into `repos/`, or
+   - add a resource to a configuration file (an existing one or a new one).
+3. Fill in the generated values in `configurations/<config>.config.json`.
 
-## Build and push application image
+## Configuration
 
-> ### Required resource: _image_
+Each file in `configurations/` holds shared settings under `config` and lists of named resources per type:
 
-- Clone application repository into `repos/`
-  - Example: `repos/myApp`
-- Docker must be running
-- Command to build docker image and push to AWS ECR
-  ```bash
-  npm run image:push <resource-name>
-  ```
-- Remote repository URL is `<image_url>:<image_tag>`. here `<image_tag>` is formed in following steps
+```json
+{
+  "config": {
+    "aws_profile": "my-profile",
+    "aws_region": "us-east-1",
+    "config_name": "my-config",
+    "task_definitions_directory": "resources/my-config/task_definitions",
+    "ssm_parameters_directory": "resources/my-config/ssm_parameters",
+    "cf_parameter_file_directory": "resources/my-config/cloudformation_parameters"
+  },
+  "service": [
+    { "name": "my-api", "config": { "ecs_cluster": "...", "ecs_service": "..." } }
+  ]
+}
+```
 
-  1. All `/`s in branch name are replaced by `.`
-  2. `.latest` is appended to the end
+Resource-level `config` overrides the shared `config`. See [templates/config_templates.json](templates/config_templates.json) for all resource types and fields (`{}` marks an optional field).
 
-  Example: tag for branch `feature/some-functionality` will be `feature.some-functionality.latest`
-
-## Start / Stop / Redeploy ECS Service
-
-> ### Required resource: _service_
-
-- Command to start with a desired task count of 1:
-  ```bash
-  npm run ecs:start_service <resource-name>
-  ```
-- Command to stop service:
-  ```bash
-  npm run ecs:stop_service <resource-name>
-  ```
-- Command to redeploy service:
-  ```bash
-  npm run ecs:redeploy_service <resource-name>
-  ```
-
-## Exec into a running container on ECS
-
-> ### Required resource: _service_
-
-- Command to exec into a container:
-  ```bash
-  npm run ecs:exec_container <resource-name>
-  ```
-
-## Environment variable management
-
-> ### Required resource: _ssm-parameter_
-
-Environment variables can be passed in bulk to the application using `AWS SSM Parameter Store`.
-
-- Command to pull .env file from Parameter Store
-
-  ```bash
-  npm run ssm_parameter:pull <resource-name>
-  ```
-
-  This command will get the parameter from SSM Parameter Store and dump its content in `ssm_parameters/parameters/<resource-name>.pulled`.
-
-- To push a parameter to SSM Parameter Store, Follow the steps:
-
-  - Create a file `ssm_parameters/parameters/<resource-name>.pushable`
-  - run `npm run ssm_parameter:push <resource-name>`
-
-  When this command is run, all the contents of file `.pushable` will be put into the SSM Parameter.
-
-## Test
-
-`test.sh` can be called to run any custom command specified in its 2nd argument. This can be used to test the AWS integration. Example:
+## Usage
 
 ```bash
-./test.sh example-resource "aws sts get-caller-identity"
-./test.sh example-resource "aws configure list"
+npm run <command> config=<config-file> resource=<resource-name> [item=<item-name>] [key=value ...]
 ```
+
+- `config` defaults to `default.config.json`.
+- Any config variable can be overridden with `key=value`.
+- All commands are also available as VS Code tasks with pickers.
+
+| Command | Resource | Description |
+| --- | --- | --- |
+| `image:push` | `image` | Pull repo branch, build Docker image, push to ECR |
+| `ecs:start_service` | `service` | Set desired count to 1 |
+| `ecs:stop_service` | `service` | Set desired count to 0 (requires `stop_allowed: true`) |
+| `ecs:redeploy_service` | `service` | Force new deployment (via CodeDeploy if configured) |
+| `ecs:exec_container` | `service` | Exec into the running container |
+| `task_definition:validate` | `task_definition` | Validate the task definition file |
+| `task_definition:register` | `task_definition` | Register the task definition file |
+| `ssm_parameter:pull` | `ssm_parameter` | Download parameter to `<ssm_parameters_directory>/<resource>.sync` |
+| `ssm_parameter:push` | `ssm_parameter` | Upload `<resource>.sync` as a SecureString |
+| `s3:deploy` | `s3_application` | Pull repo, write `env` to `.env`, build, sync dist to S3 |
+| `s3:sync` | `s3_data` | Sync a local directory to S3 |
+| `cloudfront:invalidate` | `cloudfront` | Invalidate distribution paths |
+| `cloudformation:create_stack` | `cloudformation` | Create stack from `cloudformation/templates/` |
+| `cloudformation:update_stack` | `cloudformation` | Update stack |
+| `server:ssh` | `server` | SSH into server |
+| `server:copy` | `server` | Copy a `resources` item to the server (`item=` required) |
+| `server:run_command` | `server` | Run a `commands` item on the server (`item=` required) |
+| `resource:clear_history` | - | Delete recorded history |
+
+### Notes
+
+- **Images** are tagged `<last-branch-segment>.latest` (e.g. `feature/login` → `login.latest`) unless `image_tag` is set.
+- **CloudFormation** parameters are read from `<cf_parameter_file_directory>/<resource>.json` or `parameter_filename`, if present.
+- **Server** items are defined inside the server resource:
+  ```json
+  "resources": [{ "name": "app", "local_directory_path": "path/to/files", "remote_directory": "~/app" }],
+  "commands": [{ "name": "redeploy", "command1": "docker compose pull", "command2": "docker compose up -d" }]
+  ```
 
 ## History
 
-Significant responses and file changes are recorded in `<resource-directory>/history` directory.
+Commands and their output are logged to `history/<resource-type>/<resource-name>/`. This directory is safe to delete.
 
-- Response from `aws ecs update-service` command
-- .env file history during push and pull
-
-## Tmp Directory
-
-The `services/<service_name>/history` can be removed at any point.
-
-## Command arguments
-
-Any variable defined in `<resource-name>.config.sh` can be overwritten by passing `<variable_name>=<new_value>` as a command argument. Example:
+## Tests
 
 ```bash
-./view-variables.sh example-resource aws_region=us-east-1 ssm_param_name="/new/parameter"
+npm run test
 ```
-
-# TODOs
-
-- Monitor service deployment after command is given.
-  - https://stackoverflow.com/questions/54131672/aws-ecs-monitoring-the-status-of-a-service-update
-- Upload parameters to Secret Manager
