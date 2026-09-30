@@ -38,7 +38,7 @@ function fn_get_variable_export_strings_from_json() {
     # Get .config object > get keys value pairs > filter out null values > prepare for export
     # This function returns strings in the format: key="value" or key=value
     # The values are quoted if they contain spaces
-    echo $@ | jq -r '.config | to_entries | .[] | select(.value != null and .value != {}) | 
+    echo $@ | jq -r '(.config // {}) | to_entries | .[] | select(.value != null and .value != {}) | 
         if (.value | tostring | test(" ")) then
             .key + "=" + "\"" + (.value | tostring) + "\""
         else
