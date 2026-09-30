@@ -39,7 +39,7 @@ EOF
 
 @test "register_task_definition logs the command to the resource history" {
     run_repo_script register_task_definition config=test.config.json resource=api
-    local history_files=("$root_directory"/history/task_definition/api/*.register_task_definition.history)
+    local history_files=("$root_directory"/history/test/task_definition/api/*.register_task_definition.history)
     [ -f "${history_files[0]}" ]
     grep -q "aws ecs register-task-definition" "${history_files[0]}"
     grep -q -- "---------- EXIT STATUS: 0" "${history_files[0]}"

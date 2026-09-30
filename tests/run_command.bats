@@ -7,7 +7,8 @@ setup() {
 
     resource_tag=image
     resource_name=my-image
-    history_file="$root_directory/history/image/my-image/test_execution.test_script.history"
+    config_name=my-config
+    history_file="$root_directory/history/my-config/image/my-image/test_execution.test_script.history"
 
     command_map["test-echo"]="echo"
     command_map["test-fail"]="false"
