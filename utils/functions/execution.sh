@@ -51,27 +51,27 @@ function fn_populate_and_validate_resource_tag_from_current_script_name() {
 
 # Populate the resource_directory variable from the resource_tag using the
 #     resource_tag_to_directory_map associative array.
-function fn_populate_and_validate_resource_directory_from_resource_tag() {
-    resource_directory=${resource_tag_to_directory_map[$resource_tag]}
+# function fn_populate_and_validate_resource_directory_from_resource_tag() {
+#     resource_directory=${resource_tag_to_directory_map[$resource_tag]}
 
-    if [ -z "$resource_directory" ]; then
-        fn_error "Unsupported resource tag: $resource_tag"
-        fn_fatal
-    fi
+#     if [ -z "$resource_directory" ]; then
+#         fn_error "Unsupported resource tag: $resource_tag"
+#         fn_fatal
+#     fi
 
-    # Prepend root directory
-    resource_directory="$root_directory/$resource_directory"
+#     # Prepend root directory
+#     resource_directory="$root_directory/$resource_directory"
 
-    # Create resource directory if it doesn't exist
-    if [ ! -d $resource_directory ]; then
-        mkdir -p $resource_directory || fn_fatal
-    fi
+#     # Create resource directory if it doesn't exist
+#     if [ ! -d $resource_directory ]; then
+#         mkdir -p $resource_directory || fn_fatal
+#     fi
 
-    # Copy .gitignore if it doesn't exist
-    if [ ! -f $resource_directory/.gitignore ]; then
-        cp templates/resource.gitignore.template $resource_directory/.gitignore || fn_fatal
-    fi
-}
+#     # Copy .gitignore if it doesn't exist
+#     if [ ! -f $resource_directory/.gitignore ]; then
+#         cp templates/resource.gitignore.template $resource_directory/.gitignore || fn_fatal
+#     fi
+# }
 
 function fn_populate_and_validate_resource_name() {
     resource_name=$1
@@ -100,24 +100,9 @@ function fn_validate_item_provided() {
     fn_fatal
 }
 
-function fn_populate_and_validate_resource_config_file() {
-    resource_config_file="$resource_directory/$resource_name.config.sh"
-}
-
 # List all variables in declared_variables
 function fn_list_declared_variables() {
     unset declared_variables
     declared_variables=($(compgen -A variable | grep '^[a-z].*' | grep -v '^npm_*'))
 }
 
-function fn_get_all_resource_names_in_directory() {
-    local resource_directory=$1
-    local files=($(ls -1 $resource_directory/*.config.sh 2>/dev/null))
-
-    if [ -z "$files" ]; then
-        return
-    fi
-
-    local resource_names=($(basename -a ${files[@]} | sed -e 's/.config.sh$//' | sort -u))
-    echo "${resource_names[@]}"
-}
