@@ -1,6 +1,7 @@
 {
   "name": "cloud-management",
   "scripts": {
+    "test": "npx --yes bats@1.11.0 tests",
     "resource:init": "./scripts/initialize_resource.sh",
     "resource:clear_history": "./scripts/clear_resource_history.sh",
     "image:push": "./scripts/push_image.sh",
