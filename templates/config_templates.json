@@ -1,32 +1,85 @@
 {
   "common": {
-    "aws_profile": "test",
-    "aws_region": "eu-west-1"
-  },
-  "service": {
-    "ecs_cluster": "",
-    "ecs_service": "",
-    "task_definition": "",
-    "primary_container_name": "",
-    "codedeploy_application_name": {},
-    "codedeploy_group_name": {},
-    "primary_container_port": {}
-  },
-  "ssm_parameter": {
-    "ssm_param_name": ""
+    "aws_profile": "",
+    "aws_region": "us-east-1",
+    "config_name": "",
+    "task_definitions_directory": "",
+    "ssm_parameters_directory": "",
+    "cf_parameter_file_directory": ""
   },
   "image": {
-    "repo": "",
-    "branch": "",
-    "ecr_url": "",
-    "image_name": "",
-    "image_url": {},
-    "image_tag": {}
+    "config": {
+      "repo": "",
+      "branch": "",
+      "ecr_url": "",
+      "image_name": "",
+      "build_directory": {},
+      "platform": {},
+      "image_url": {},
+      "image_tag": {}
+    }
   },
   "task_definition": {
-    "task_definition_file": {}
+    "config": {
+      "task_definition_file": {}
+    }
   },
-  "cf_template": {
-    "template_file": {}
+  "service": {
+    "config": {
+      "ecs_cluster": "",
+      "ecs_service": "",
+      "task_definition": "",
+      "primary_container_name": "",
+      "primary_container_port": {},
+      "codedeploy_application_name": {},
+      "codedeploy_group_name": {},
+      "stop_allowed": {}
+    }
+  },
+  "ssm_parameter": {
+    "config": {
+      "ssm_param_name": ""
+    }
+  },
+  "s3_application": {
+    "config": {
+      "repo": "",
+      "branch": "",
+      "s3_bucket": "",
+      "build_command": "",
+      "dist_directory": "",
+      "env_file": {},
+      "env": {}
+    }
+  },
+  "s3_data": {
+    "config": {
+      "local_directory": "",
+      "s3_bucket": "",
+      "remote_directory": "/"
+    }
+  },
+  "cloudfront": {
+    "config": {
+      "distribution_id": "",
+      "paths": ["/*"]
+    }
+  },
+  "cloudformation": {
+    "config": {
+      "stack_name": "",
+      "template_filename": "",
+      "parameter_filename": {}
+    }
+  },
+  "server": {
+    "config": {
+      "host": "",
+      "username": "",
+      "key_path": "",
+      "starting_directory": {}
+    },
+    "resources": [],
+    "commands": []
   }
 }

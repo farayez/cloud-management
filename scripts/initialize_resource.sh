@@ -3,122 +3,137 @@
 # Initialize execution
 . ./utils/prepare_runtime.sh
 
+config_templates_file=$root_directory/templates/config_templates.json
+configurations_directory=$root_directory/configurations
+new_config_option="+ Create new configuration"
+
 fn_validate_json_in_file() {
-    fn_info "Validating JSON in $1"
-    local t
-    if ! t=$(jq -re . "$1"); then
-        fn_error "Invalid JSON in $1"
-        fn_fatal
-    fi
+    jq -e . "$1" >/dev/null || fn_fatal "Invalid JSON in $1"
 }
 
-fn_create_resource_config_from_user_input() {
-    # First parameter is the resource tag
-    # Should be one of the following: "image", "repo", "ssm_parameter", "secret", "service", "task_definition"
-    resource_tag=$1
-
-    # Validate resource_tag
-    if [ -z "$resource_tag" ]; then
-        fn_error "resource_tag must be provided"
-        fn_fatal
-    fi
-
-    # Get user input for name of resource
-    fn_request_mandatory_text_input "Enter $resource_tag name for initializtion: " resource_name
-
-    # Get config template filename
-    local config_templates_file=$root_directory/templates/config_templates.json
-
-    # Validate config template file
-    if [ ! -f $config_templates_file ]; then
-        fn_error "Config template file not found"
-        fn_fatal
-    fi
-    fn_validate_json_in_file $config_templates_file
-
-    # Gather config templates from config template file
-    local resource_config
-    resource_config=$(jq -e -r ".${resource_tag}" "$config_templates_file") || fn_fatal
-    local common_config
-    common_config=$(jq -e -r '.common' "$config_templates_file") || fn_fatal
-
-    # Get active config filename
-    local config_file=configurations/default.config.json
-
-    # Create default config file if it doesn't exist or is empty
-    if [ ! -f $config_file ] || [ -z "$(cat $config_file)" ]; then
-        jq '{}' -n >$config_file
-
-        # Add common config to the default config file if it doesn't exist
-        local tmp
-        tmp=$(jq ".config += $common_config" $config_file) || fn_fatal
-        echo "$tmp" >$config_file
-        fn_info "Default config file created in $config_file"
-    fi
-
-    # Validate default config file
-    fn_validate_json_in_file $config_file
-
-    # Check whether resource already exists in config file
-    local existing_resource
-    existing_resource=$(jq -r ".${resource_tag}[] | select(.name == \"$resource_name\")" $config_file 2>/dev/null)
-    if [ -n "$existing_resource" ]; then
-        fn_error "Resource $resource_name already exists in $config_file"
-        fn_fatal
-    fi
-
-    # Add template resource configurations to config file
-    local config_to_add
-    config_to_add="[{\"name\": \"$resource_name\", \"config\": $resource_config}]"
-    tmp=$(jq ".${resource_tag} += ${config_to_add}" $config_file) || fn_fatal
-    echo "$tmp" >$config_file
-
-    fn_info "Config added in $config_file"
+# Names end up in file paths and JSON, so restrict them to a safe character set
+fn_validate_name() {
+    [[ "$1" =~ ^[A-Za-z0-9._-]+$ ]] || fn_fatal "Invalid name '$1'. Allowed characters: letters, digits, '.', '_', '-'"
 }
 
-fn_choose_from_menu "Select resource to initialize:" selected_resource "${!resource_tag_to_directory_map[@]}"
-resource_tag=$selected_resource
+# Usage: fn_update_json_file <file> [jq options...] <filter>
+fn_update_json_file() {
+    local file=$1
+    shift
+    local updated
+    updated=$(jq "$@" "$file") || fn_fatal "Failed to update $file"
+    echo "$updated" >"$file"
+}
 
-case $selected_resource in
-"repo")
-    # fn_fatal "$selected_resource initialization not available yet"
-    fn_request_mandatory_text_input "Enter Git repository URL for initializtion: " git_url
+fn_create_config_file() {
+    local config_name
+    fn_request_mandatory_text_input "Enter new configuration name: " config_name
+    fn_validate_name "$config_name"
 
-    fn_populate_and_validate_resource_directory_from_resource_tag
-    git -C $resource_directory clone $git_url || fn_fatal
-    ;;
-"image")
-    fn_create_resource_config_from_user_input $selected_resource
-    ;;
-"ssm_parameter")
-    fn_populate_and_validate_resource_directory_from_resource_tag
-    fn_create_resource_config_from_user_input $selected_resource
-    ;;
-"secret")
-    fn_fatal "$selected_resource initialization not available yet"
-    ;;
-"service")
-    fn_create_resource_config_from_user_input $selected_resource
-    ;;
-"task_definition")
-    fn_create_resource_config_from_user_input $selected_resource
+    config=$config_name.config.json
+    local file=$configurations_directory/$config
+    [ -e "$file" ] && fn_fatal "Configuration file $file already exists"
 
-    fn_populate_and_validate_resource_directory_from_resource_tag
+    local content
+    content=$(jq --arg name "$config_name" '{config: (.common + {
+        config_name: $name,
+        task_definitions_directory: "resources/\($name)/task_definitions",
+        ssm_parameters_directory: "resources/\($name)/ssm_parameters",
+        cf_parameter_file_directory: "resources/\($name)/cloudformation_parameters"
+    })}' "$config_templates_file") || fn_fatal "Failed to create $file"
+    echo "$content" >"$file"
 
-    # Copy task definition template
-    if [ -f "$resource_directory/$resource_name.pushable.json" ]; then
-        fn_error "Task definition file for $resource_name already exists. Not overwriting."
-    else
-        cp templates/task-definition.template.json $resource_directory/$resource_name.pushable.json || fn_fatal
+    fn_info "Configuration file created in $file"
+}
+
+# Populates config_file from the config argument or user selection
+fn_select_config_file() {
+    if [ -z "$config" ]; then
+        local config_files=() file
+        for file in "$configurations_directory"/*.config.json; do
+            [ -f "$file" ] && config_files+=("$(basename "$file")")
+        done
+        fn_choose_from_menu "Select configuration file:" config "${config_files[@]}" "$new_config_option"
     fi
-    ;;
-"cf_template")
-    fn_populate_and_validate_resource_directory_from_resource_tag
-    fn_create_resource_config_from_user_input $selected_resource
-    ;;
-*)
-    fn_fatal "invalid selection"
-    ;;
-esac
+
+    if [ "$config" = "$new_config_option" ]; then
+        fn_create_config_file
+    fi
+
+    fn_validate_name "$config"
+    config_file=$configurations_directory/$config
+    [ -f "$config_file" ] || fn_fatal "Configuration file $config_file not found"
+    fn_validate_json_in_file "$config_file"
+}
+
+fn_add_resource_to_config_file() {
+    fn_request_mandatory_text_input "Enter $resource_tag name for initialization: " resource_name
+    fn_validate_name "$resource_name"
+
+    if jq -e --arg tag "$resource_tag" --arg name "$resource_name" \
+        '(.[$tag] // [])[] | select(.name == $name)' "$config_file" >/dev/null; then
+        fn_fatal "$resource_tag $resource_name already exists in $config"
+    fi
+
+    local resource_template
+    resource_template=$(jq -e --arg tag "$resource_tag" '.[$tag]' "$config_templates_file") ||
+        fn_fatal "No template found for $resource_tag"
+
+    fn_update_json_file "$config_file" \
+        --arg tag "$resource_tag" \
+        --arg name "$resource_name" \
+        --argjson template "$resource_template" \
+        '.[$tag] = ((.[$tag] // []) + [{name: $name} + $template])'
+
+    fn_info "$resource_tag $resource_name added to $config_file"
+}
+
+fn_create_task_definition_file() {
+    local task_definitions_directory
+    task_definitions_directory=$(jq -r '.config.task_definitions_directory // empty' "$config_file")
+    local directory=$root_directory/${task_definitions_directory:-task_definitions}
+    local file=$directory/$resource_name.json
+
+    if [ -f "$file" ]; then
+        fn_warning "Task definition file $file already exists. Not overwriting."
+        return
+    fi
+
+    mkdir -p "$directory" || fn_fatal
+    local content
+    content=$(jq --arg family "$resource_name" '.family = $family' \
+        "$root_directory/templates/task-definition.template.json") || fn_fatal "Failed to create $file"
+    echo "$content" >"$file"
+
+    fn_info "Task definition file created in $file"
+}
+
+fn_clone_repo() {
+    local git_url
+    fn_request_mandatory_text_input "Enter Git repository URL for initialization: " git_url
+    mkdir -p "$root_directory/repos" || fn_fatal
+    git -C "$root_directory/repos" clone -- "$git_url" || fn_fatal
+}
+
+fn_parse_arguments "$@" || fn_fatal
+
+[ -f "$config_templates_file" ] || fn_fatal "Config template file $config_templates_file not found"
+fn_validate_json_in_file "$config_templates_file"
+
+mapfile -t resource_tags < <(jq -r 'del(.common) | keys_unsorted[]' "$config_templates_file")
+fn_choose_from_menu "Select resource to initialize:" resource_tag "${resource_tags[@]}" "repo"
+
+# Repos are cloned into repos/ and referenced by name from config files
+if [ "$resource_tag" = "repo" ]; then
+    fn_clone_repo
+    fn_success "Repo Initialized"
+fi
+
+fn_select_config_file
+fn_add_resource_to_config_file
+
+if [ "$resource_tag" = "task_definition" ]; then
+    fn_create_task_definition_file
+fi
 
 fn_success "Resource Initialized"
