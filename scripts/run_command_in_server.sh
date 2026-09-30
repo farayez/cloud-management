@@ -29,7 +29,7 @@ while true; do
     remote_command="$command_to_run"
     [ -n "$remote_directory" ] && remote_command="cd $remote_directory && $command_to_run"
 
-    ssh -i $root_directory/$key_path $username@$host "$remote_command" 2>&1 </dev/null |
+    fn_run ssh -i "$root_directory/$key_path" "$username@$host" "$remote_command" </dev/null |
         while IFS= read -r line; do
             printf '%b%s\n' "$remote_prefix" "$line"
         done
