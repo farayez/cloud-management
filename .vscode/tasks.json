@@ -360,18 +360,58 @@
   ],
   "inputs": [
     {
+      // Picks a config (yaml preferred over json, like parse_config.sh) and caches it as JSON for the pickers below
       "id": "configurationFilePicker",
       "type": "command",
-      "command": "extension.commandvariable.file.pickFile",
+      "command": "extension.commandvariable.transform",
       "args": {
-        "keyRemember": "selectedConfigFile",
-        "include": "configurations/*.config.json",
-        "display": "transform",
-        "valueTransform": {
-          "text": "${fileBasename}"
-        },
-        "labelTransform": {
-          "text": "${fileBasename}"
+        "text": "${transform:selectedConfig}${transform:configCache}",
+        "transform": {
+          "selectedConfig": {
+            "text": "${pickFile:configFile}",
+            "pickFile": {
+              "configFile": {
+                "keyRemember": "selectedConfigFile",
+                "include": "configurations/*.config.{yaml,yml,json}",
+                "display": "transform",
+                "valueTransform": {
+                  "text": "${fileBasename}",
+                  "find": "\\.(json|ya?ml)$",
+                  "replace": ""
+                },
+                "labelTransform": {
+                  "text": "${fileBasename}",
+                  "find": "\\.(json|ya?ml)$",
+                  "replace": ""
+                }
+              }
+            }
+          },
+          "configCache": {
+            "text": "${jsExpression:configJson}",
+            "saveToFile": "${workspaceFolder}/.vscode/.selected-config.json",
+            "empty": true,
+            "jsExpression": {
+              "configJson": {
+                "expression": "JSON.stringify(${fileContent:yaml} ?? ${fileContent:yml} ?? ${fileContent:json})",
+                // A missing file is read as the string "Unknown", which maps to null here
+                "fileContent": {
+                  "yaml": {
+                    "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}.yaml",
+                    "yaml": "content !== null && typeof content === 'object' ? JSON.stringify(content) : 'null'"
+                  },
+                  "yml": {
+                    "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}.yml",
+                    "yaml": "content !== null && typeof content === 'object' ? JSON.stringify(content) : 'null'"
+                  },
+                  "json": {
+                    "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}.json",
+                    "yaml": "content !== null && typeof content === 'object' ? JSON.stringify(content) : 'null'"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -381,7 +421,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Service?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.service[__itemIdx__ ].name"
       }
@@ -393,7 +433,7 @@
       "args": {
         "description": "Which Server?",
         "key": "selectedServer",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.server[__itemIdx__ ].name"
       }
@@ -405,7 +445,7 @@
       "args": {
         "description": "Which Resource?",
         "key": "selectedServerResourceItem",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.server.find(s => s.name === '${remember:selectedServer}').resources[__itemIdx__].name"
       }
@@ -417,7 +457,7 @@
       "args": {
         "description": "Which Command?",
         "key": "selectedServerCommandItem",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.server.find(s => s.name === '${remember:selectedServer}').commands[__itemIdx__].name"
       }
@@ -428,7 +468,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Parameter?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.ssm_parameter[__itemIdx__ ].name"
       }
@@ -439,7 +479,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Image?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.image[__itemIdx__ ].name"
       }
@@ -450,7 +490,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Task Definition?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.task_definition[__itemIdx__ ].name"
       }
@@ -461,7 +501,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which CloudFormation Stack?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.cloudformation[__itemIdx__ ].name"
       }
@@ -472,7 +512,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which Service?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.s3_application[__itemIdx__ ].name"
       }
@@ -483,7 +523,7 @@
       "command": "extension.commandvariable.pickStringRemember",
       "args": {
         "description": "Which CloudFront Distribution?",
-        "fileName": "${workspaceFolder}/configurations/${remember:selectedConfigFile}",
+        "fileName": "${workspaceFolder}/.vscode/.selected-config.json",
         "fileFormat": "json",
         "jsonOption": "content.cloudfront[__itemIdx__ ].name"
       }

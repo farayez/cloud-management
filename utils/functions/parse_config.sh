@@ -1,9 +1,22 @@
 #!/bin/bash
 
 function fn_populate_config_variables() {
-    # Fetch json config for provided stack
-    local config_file="${config:-default.config.json}"
-    local config_file_content=$(echo "$(<$root_directory/configurations/$config_file)")
+    # Fetch config for provided stack, preferring yaml over json
+    local config_base="${config:-default.config.json}"
+    config_base="${config_base%.json}"
+    config_base="${config_base%.yaml}"
+    config_base="${config_base%.yml}"
+    local config_path="$root_directory/configurations/$config_base"
+    local config_file_content
+    if [ -f "$config_path.yaml" ]; then
+        config_file_content=$(yq -o=json '.' "$config_path.yaml")
+    elif [ -f "$config_path.yml" ]; then
+        config_file_content=$(yq -o=json '.' "$config_path.yml")
+    elif [ -f "$config_path.json" ]; then
+        config_file_content=$(<"$config_path.json")
+    else
+        fn_fatal "No yaml or json configuration file found for $config_base"
+    fi
 
     # Populate stack level config variables
     fn_populate_config_variables_from_json "$config_file_content"
