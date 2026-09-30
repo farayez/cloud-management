@@ -69,9 +69,9 @@ fn_run() {
         # Echo output and log it to the history file
         script -q -c "$cmd $*; echo -n \$? > $exit_code_file" /dev/null | tee -a "$history_file"
     else
-        # Use printf to properly escape and quote each parameter
+        # %q escapes embedded quotes so each parameter survives bash -c intact
         params=("$@")
-        quoted_params=$(printf "'%s' " "${params[@]}")
+        quoted_params=$(printf '%q ' "${params[@]}")
 
         # View the command to be run
         # stdbuf -oL -eL echo "$cmd $quoted_params"
