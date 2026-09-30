@@ -31,10 +31,12 @@ declare -A script_name_to_resource_tag_map=(
     ["update_cloudformation_stack"]="cloudformation"
     ["ssh_into_server"]="server"
     ["copy_to_server"]="server"
+    ["run_command_in_server"]="server"
 )
 
 declare -A script_name_to_sub_resource_array_map=(
     ["copy_to_server"]="resources"
+    ["run_command_in_server"]="commands"
 )
 
 declare -A script_name_to_parameter_map=(
