@@ -32,7 +32,10 @@ Each file in `configurations/` holds shared settings under `config` and lists of
     "cf_parameter_file_directory": "resources/my-config/cloudformation_parameters"
   },
   "service": [
-    { "name": "my-api", "config": { "ecs_cluster": "...", "ecs_service": "..." } }
+    {
+      "name": "my-api",
+      "config": { "ecs_cluster": "...", "ecs_service": "..." }
+    }
   ]
 }
 ```
@@ -49,26 +52,26 @@ npm run <command> config=<config-file> resource=<resource-name> [item=<item-name
 - Any config variable can be overridden with `key=value`.
 - All commands are also available as VS Code tasks with pickers.
 
-| Command | Resource | Description |
-| --- | --- | --- |
-| `image:push` | `image` | Pull repo branch, build Docker image, push to ECR |
-| `ecs:start_service` | `service` | Set desired count to 1 |
-| `ecs:stop_service` | `service` | Set desired count to 0 (requires `stop_allowed: true`) |
-| `ecs:redeploy_service` | `service` | Force new deployment (via CodeDeploy if configured) |
-| `ecs:exec_container` | `service` | Exec into the running container |
-| `task_definition:validate` | `task_definition` | Validate the task definition file |
-| `task_definition:register` | `task_definition` | Register the task definition file |
-| `ssm_parameter:pull` | `ssm_parameter` | Download parameter to `<ssm_parameters_directory>/<resource>.sync` |
-| `ssm_parameter:push` | `ssm_parameter` | Upload `<resource>.sync` as a SecureString |
-| `s3:deploy` | `s3_application` | Pull repo, write `env` to `.env`, build, sync dist to S3 |
-| `s3:sync` | `s3_data` | Sync a local directory to S3 |
-| `cloudfront:invalidate` | `cloudfront` | Invalidate distribution paths |
-| `cloudformation:create_stack` | `cloudformation` | Create stack from `cloudformation/templates/` |
-| `cloudformation:update_stack` | `cloudformation` | Update stack |
-| `server:ssh` | `server` | SSH into server |
-| `server:copy` | `server` | Copy a `resources` item to the server (`item=` required) |
-| `server:run_command` | `server` | Run a `commands` item on the server (`item=` required) |
-| `resource:clear_history` | - | Delete recorded history |
+| Command                       | Resource          | Description                                                        |
+| ----------------------------- | ----------------- | ------------------------------------------------------------------ |
+| `image:push`                  | `image`           | Pull repo branch, build Docker image, push to ECR                  |
+| `ecs:start_service`           | `service`         | Set desired count to 1                                             |
+| `ecs:stop_service`            | `service`         | Set desired count to 0 (requires `stop_allowed: true`)             |
+| `ecs:redeploy_service`        | `service`         | Force new deployment (via CodeDeploy if configured)                |
+| `ecs:exec_container`          | `service`         | Exec into the running container                                    |
+| `task_definition:validate`    | `task_definition` | Validate the task definition file                                  |
+| `task_definition:register`    | `task_definition` | Register the task definition file                                  |
+| `ssm_parameter:pull`          | `ssm_parameter`   | Download parameter to `<ssm_parameters_directory>/<resource>.sync` |
+| `ssm_parameter:push`          | `ssm_parameter`   | Upload `<resource>.sync` as a SecureString                         |
+| `s3:deploy`                   | `s3_application`  | Pull repo, write `env` to `.env`, build, sync dist to S3           |
+| `s3:sync`                     | `s3_data`         | Sync a local directory to S3                                       |
+| `cloudfront:invalidate`       | `cloudfront`      | Invalidate distribution paths                                      |
+| `cloudformation:create_stack` | `cloudformation`  | Create stack from `cloudformation/templates/`                      |
+| `cloudformation:update_stack` | `cloudformation`  | Update stack                                                       |
+| `server:ssh`                  | `server`          | SSH into server                                                    |
+| `server:copy`                 | `server`          | Copy a `resources` item to the server (`item=` required)           |
+| `server:run_command`          | `server`          | Run a `commands` item on the server (`item=` required)             |
+| `resource:clear_history`      | -                 | Delete recorded history                                            |
 
 ### Notes
 
@@ -82,7 +85,7 @@ npm run <command> config=<config-file> resource=<resource-name> [item=<item-name
 
 ## History
 
-Commands and their output are logged to `history/<resource-type>/<resource-name>/`. This directory is safe to delete.
+Commands and their output are logged to `history/<config-name>/<resource-type>/<resource-name>/`. This directory is safe to delete.
 
 ## Tests
 
