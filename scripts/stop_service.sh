@@ -2,6 +2,8 @@
 
 . ./utils/pre_execution.sh
 
+fn_validate_variables ecs_cluster ecs_service aws_region
+
 if [ "$stop_allowed" != "true" ]; then
     fn_fatal "Stop is not allowed"
 fi

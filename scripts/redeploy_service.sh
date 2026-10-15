@@ -19,7 +19,7 @@ if [[ -n "$codedeploy_application_name" ]]; then
         --region $aws_region \
         --task-definition $task_definition \
         --query 'taskDefinition.taskDefinitionArn' \
-        --output text)
+        --output text) || fn_fatal "Failed to retrieve latest task definition ARN"
     fn_info "Latest task ARN: $task_definition_latest_arn"
 
     revision_json=$(fn_get_codedeploy_revision_json "$task_definition_latest_arn" "$primary_container_name" "$primary_container_port")
@@ -44,12 +44,16 @@ else
     #     --query 'taskDefinition.taskDefinitionArn' \
     #     --output text)
 
+    # Keep the service's current task definition when none is configured
+    task_definition_option=()
+    [ -n "$task_definition" ] && task_definition_option=(--task-definition "$task_definition")
+
     fn_run update-service \
         --cluster $ecs_cluster \
         --service $ecs_service \
         --region $aws_region \
         --enable-execute-command \
-        --task-definition $task_definition \
+        "${task_definition_option[@]}" \
         --force-new-deployment || fn_fatal
 fi
 

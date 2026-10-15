@@ -15,6 +15,7 @@ result=$(fn_run ssm-get-parameter \
     --query 'Parameter.Value') || fn_fatal
 
 mkdir -p "$parameter_directory" || fn_fatal
-echo "$result" >"$parameter_file"
+# No trailing newline, so pushing the file back does not alter the value
+printf '%s' "$result" >"$parameter_file"
 
 fn_success "Parameter pulled from SSM Parameter Store"

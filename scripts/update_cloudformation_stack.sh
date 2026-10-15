@@ -42,6 +42,7 @@ fn_run update-cf-stack \
     --stack-name $stack_name \
     --region $aws_region \
     $parameters_option \
+    --capabilities CAPABILITY_NAMED_IAM \
     --template-body file://$template_file || fn_fatal "Stack update failed"
 
 fn_success "CloudFormation Stack Updated"

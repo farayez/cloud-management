@@ -18,10 +18,6 @@ while true; do
     # Commands are numbered consecutively, stop at the first gap
     [ -z "$command_to_run" ] && break
 
-    # Config values containing spaces are exported wrapped in literal quotes
-    command_to_run="${command_to_run#\"}"
-    command_to_run="${command_to_run%\"}"
-
     fn_section_start "$command_variable"
     fn_info "$command_to_run"
 

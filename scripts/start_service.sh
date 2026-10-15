@@ -5,6 +5,8 @@ desired_count=1
 
 . ./utils/pre_execution.sh
 
+fn_validate_variables ecs_cluster ecs_service aws_region desired_count
+
 fn_section_start "Starting ECS service: $ecs_service"
 
 fn_run update-service \

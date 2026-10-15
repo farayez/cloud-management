@@ -7,9 +7,10 @@ fn_validate_variables root_directory repo aws_region s3_bucket build_command dis
 fn_section_start "Deploying Application $repo"
 
 # Prepare branch name when not provided in config
-if [ ! -v branch ]; then
-    if [ -v branch_options ]; then
-        fn_choose_from_menu "Select branch: " branch $branch_options
+if [ -z "$branch" ]; then
+    if [ -n "$branch_options" ]; then
+        mapfile -t branch_choices < <(jq -Rr 'fromjson? // . | if type == "array" then .[] else . end' <<<"$branch_options")
+        fn_choose_from_menu "Select branch: " branch "${branch_choices[@]}"
     else
         fn_input_text "Enter branch: " branch
     fi
@@ -25,12 +26,10 @@ fn_run git -C $repo_directory fetch -a || fn_fatal
 fn_run git -C $repo_directory checkout $branch || fn_fatal
 fn_run git -C $repo_directory pull || fn_fatal
 
-echo $repo_directory
-
 # Handle environment variables if provided
-if [ -v env ]; then
+if [ -n "$env" ]; then
     # Set $env_file to .env by default if not provided in config
-    if [ ! -v env_file ]; then
+    if [ -z "$env_file" ]; then
         env_file=".env"
     fi
 
