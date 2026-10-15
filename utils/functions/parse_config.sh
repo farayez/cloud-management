@@ -22,7 +22,7 @@ function fn_populate_config_variables() {
     fn_populate_config_variables_from_json "$config_file_content"
 
     # Populate resource level config variables
-    local resource_content=$(echo $config_file_content | jq -r --arg path "$resource_tag" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
+    local resource_content=$(printf '%s' "$config_file_content" | jq -r --arg path "$resource_tag" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
     fn_populate_config_variables_from_json "$resource_content"
 
     # Populate sub-resource level config variables for the selected item
@@ -49,12 +49,7 @@ function fn_populate_config_variables_from_json() {
 
 function fn_get_variable_export_strings_from_json() {
     # Get .config object > get keys value pairs > filter out null values > prepare for export
-    # This function returns strings in the format: key="value" or key=value
-    # The values are quoted if they contain spaces
-    echo $@ | jq -r '(.config // {}) | to_entries | .[] | select(.value != null and .value != {}) | 
-        if (.value | tostring | test(" ")) then
-            .key + "=" + "\"" + (.value | tostring) + "\""
-        else
-            .key + "=" + (.value | tostring)
-        end'
+    # This function returns strings in the format: key=value
+    printf '%s' "$1" | jq -r '(.config // {}) | to_entries | .[] | select(.value != null and .value != {}) |
+        .key + "=" + (.value | tostring)'
 }

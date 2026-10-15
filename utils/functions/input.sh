@@ -3,7 +3,7 @@
 # Ask for user input
 fn_input_text() {
     echo -n -e "$CONSOLE_COLOR_CYAN$1$CONSOLE_COLOR_GREEN"
-    read $2
+    read -r "$2"
     echo -e "$CONSOLE_COLOR_DEFAULT"
 }
 
@@ -25,7 +25,7 @@ function fn_choose_from_menu() {
     shift
     local options=("$@") cur=0 count=${#options[@]} index=0
     local esc=$(echo -en "\e") # cache ESC as test doesn't allow esc codes
-    printf "$prompt\n"
+    printf '%b\n' "$prompt"
     while true; do
         # list all options (option list is zero-based)
         index=0
@@ -50,6 +50,6 @@ function fn_choose_from_menu() {
         echo -en "\e[${count}A" # go up to the beginning to re-render
     done
     # export the selection to the requested output variable
-    printf -v $outvar "${options[$cur]}"
+    printf -v "$outvar" '%s' "${options[$cur]}"
     echo ""
 }

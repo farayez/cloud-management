@@ -3,12 +3,11 @@
 function fn_parse_arguments() {
     local argument
     for argument in "$@"; do
-        local key=$(echo $argument | cut -f1 -d=)
-        
+        local key="${argument%%=*}"
+
         # Strip leading -- from key if present
         key=${key#--}
 
-        local key_length=${#argument}
         local value_start=$((${#key} + 1))
         # Add 2 if original had -- prefix
         if [[ $argument == --* ]]; then
@@ -16,7 +15,7 @@ function fn_parse_arguments() {
         fi
         local value="${argument:$value_start}"
 
-        if [ ! -z $value ]; then
+        if [ -n "$value" ]; then
             export "$key"="$value"
         fi
     done
@@ -77,7 +76,7 @@ function fn_populate_and_validate_resource_name() {
     resource_name=$1
 
     # Validate resource_name argument
-    if [ -z $resource_name ]; then
+    if [ -z "$resource_name" ]; then
         fn_error "resource argument must be populated"
         fn_fatal
     fi

@@ -64,20 +64,18 @@ fn_run() {
     local exit_code_file
     exit_code_file=$(mktemp)
 
+    # %q escapes embedded quotes so each parameter survives the shell re-parse intact
+    local quoted_params=""
+    if [ $# -gt 0 ]; then
+        quoted_params=$(printf '%q ' "$@")
+    fi
+
     # Run the command
     if $unbuffered_echo; then
         # Unbuffered output. Contains all the original formatting
         # Echo output and log it to the history file
-        script -q -c "$cmd $*; echo -n \$? > $exit_code_file" /dev/null | tee -a "$history_file"
+        script -q -c "$cmd $quoted_params; echo -n \$? > $(printf '%q' "$exit_code_file")" /dev/null | tee -a "$history_file"
     else
-        # %q escapes embedded quotes so each parameter survives bash -c intact
-        params=("$@")
-        quoted_params=$(printf '%q ' "${params[@]}")
-
-        # View the command to be run
-        # stdbuf -oL -eL echo "$cmd $quoted_params"
-        # echo ""
-
         if $no_echo; then
             # No output. Runs the command silently.
             # Only log output to the history file
@@ -96,8 +94,10 @@ fn_run() {
 
     # Read the exit code from the temporary file
     local exit_code
-    exit_code=$(cat $exit_code_file)
-    rm -f $exit_code_file
+    exit_code=$(cat "$exit_code_file")
+    rm -f "$exit_code_file"
+    # A missing exit code means the command never completed
+    exit_code=${exit_code:-1}
 
     # Write the exit code to the history file
     echo -e "---------- EXIT STATUS: $exit_code\n" >>"$history_file"

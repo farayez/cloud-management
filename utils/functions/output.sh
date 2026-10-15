@@ -58,7 +58,7 @@ fn_halt() {
 fn_draw_separator() {
     echo -e -n "${CONSOLE_COLOR_PURPLE}"
     local half_terminal_width=$(($(tput cols) * 2 / 3))
-    local dashes_to_print=$((70 < half_terminal_width ? 80 : half_terminal_width))
+    local dashes_to_print=$((80 < half_terminal_width ? 80 : half_terminal_width))
     printf '%*s\n' "$dashes_to_print" | tr ' ' '-'
     echo -e -n "${CONSOLE_COLOR_DEFAULT}"
 }
