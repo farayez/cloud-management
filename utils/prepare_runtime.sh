@@ -30,3 +30,8 @@ root_directory=$(pwd)
 . ./utils/declare_functions.sh
 
 fn_draw_separator
+
+# Show start time now and end time on exit
+execution_start_time=$(date +"%Y-%m-%d %H:%M:%S")
+fn_info "Start time: $execution_start_time"
+trap 'fn_info "End time:   $(date +"%Y-%m-%d %H:%M:%S")"' EXIT
