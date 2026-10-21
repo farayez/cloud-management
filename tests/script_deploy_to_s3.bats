@@ -63,6 +63,27 @@ setup() {
         "dist_directory": "dist"
       }
     },
+    {
+      "name": "quoted-build",
+      "config": {
+        "repo": "site-repo",
+        "branch": "main",
+        "s3_bucket": "site-bucket",
+        "build_command": "echo \"a  b\" > built.txt && cp .env built-env",
+        "dist_directory": "dist",
+        "env": { "APP_NAME": "My App" }
+      }
+    },
+    {
+      "name": "branch-options",
+      "config": {
+        "repo": "site-repo",
+        "branch_options": ["main", "develop"],
+        "s3_bucket": "site-bucket",
+        "build_command": "true",
+        "dist_directory": "dist"
+      }
+    },
     { "name": "invalid", "config": { "repo": "site-repo", "s3_bucket": "site-bucket" } }
   ]
 }
@@ -135,6 +156,19 @@ aws s3 sync --region us-east-1 $repo_directory/dist s3://site-bucket/"
     run_repo_script deploy_to_s3 config=test.config.json resource=website
     [ "$status" -eq 1 ]
     [[ "$(plain_output)" != *"SUCCESS"* ]]
+}
+
+@test "deploy_to_s3 passes build_command and env values with spaces and quotes intact" {
+    run_repo_script deploy_to_s3 config=test.config.json resource=quoted-build
+    [ "$status" -eq 0 ]
+    [ "$(<"$repo_directory/built.txt")" = "a  b" ]
+    [ "$(<"$repo_directory/built-env")" = "APP_NAME=My App" ]
+}
+
+@test "deploy_to_s3 offers branch_options in a menu" {
+    run_repo_script deploy_to_s3 config=test.config.json resource=branch-options < <(menu_select 1)
+    [ "$status" -eq 0 ]
+    [[ "$(mock_calls)" == *"git -C $repo_directory checkout develop"* ]]
 }
 
 @test "deploy_to_s3 fails when required config is missing" {

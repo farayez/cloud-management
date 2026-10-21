@@ -106,13 +106,13 @@ EOF
     run_repo_script update_cloudformation_stack config=test.config.json resource=network
     [ "$status" -eq 0 ]
     [[ "$(plain_output)" == *"SUCCESS: CLOUDFORMATION STACK UPDATED"* ]]
-    [ "$(mock_calls)" = "aws cloudformation update-stack --stack-name network-stack --region us-east-1 --parameters file://$default_parameter_file --template-body file://$template_file" ]
+    [ "$(mock_calls)" = "aws cloudformation update-stack --stack-name network-stack --region us-east-1 --parameters file://$default_parameter_file --capabilities CAPABILITY_NAMED_IAM --template-body file://$template_file" ]
 }
 
 @test "update_cloudformation_stack updates the stack without parameters when no parameter file exists" {
     run_repo_script update_cloudformation_stack config=test.config.json resource=network
     [ "$status" -eq 0 ]
-    [ "$(mock_calls)" = "aws cloudformation update-stack --stack-name network-stack --region us-east-1 --template-body file://$template_file" ]
+    [ "$(mock_calls)" = "aws cloudformation update-stack --stack-name network-stack --region us-east-1 --capabilities CAPABILITY_NAMED_IAM --template-body file://$template_file" ]
 }
 
 @test "update_cloudformation_stack uses parameter_filename from config" {

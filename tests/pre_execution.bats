@@ -51,7 +51,7 @@ run_script() {
 @test "pre_execution loads the selected item" {
     run_script run_command_in_server config=test.config.json resource=web item=deploy
     [ "$status" -eq 0 ]
-    [[ "$output" == *'command1="echo hi"'* ]]
+    [[ "$output" == *'command1=echo hi'* ]]
 }
 
 @test "pre_execution fails when the resource argument is missing" {

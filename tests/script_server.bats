@@ -28,7 +28,8 @@ setup() {
       "commands": [
         { "name": "deploy", "command1": "git pull", "command2": "docker compose up -d", "command4": "never run" },
         { "name": "in-directory", "command1": "ls", "remote_directory": "/srv/app" },
-        { "name": "invalid", "command2": "ls" }
+        { "name": "invalid", "command2": "ls" },
+        { "name": "quoted", "command1": "echo \"a b\"" }
       ]
     },
     {
@@ -158,6 +159,12 @@ ssh -i $key_file ubuntu@10.0.0.1 docker compose up -d"
     [ "$status" -eq 1 ]
     [[ "$(plain_output)" == *"COMMAND1 FAILED WITH EXIT CODE 3: GIT PULL"* ]]
     [ "$(mock_calls)" = "ssh -i $key_file ubuntu@10.0.0.1 git pull" ]
+}
+
+@test "run_command_in_server keeps quotes inside commands" {
+    run_repo_script run_command_in_server config=test.config.json resource=web item=quoted
+    [ "$status" -eq 0 ]
+    [ "$(mock_calls)" = "ssh -i $key_file ubuntu@10.0.0.1 echo \"a b\"" ]
 }
 
 @test "run_command_in_server fails when command1 is missing" {

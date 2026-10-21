@@ -34,7 +34,6 @@ setup() {
 }
 
 @test "fn_parse_arguments accepts values containing spaces" {
-    skip "Known bug: unquoted \$value in the empty check of fn_parse_arguments"
     fn_parse_arguments "description=hello world"
     [ "$description" = "hello world" ]
 }

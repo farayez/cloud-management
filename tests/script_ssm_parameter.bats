@@ -41,6 +41,7 @@ EOF
     [[ "$(plain_output)" == *"SUCCESS: PARAMETER PULLED FROM SSM PARAMETER STORE"* ]]
     [ "$(mock_calls)" = "aws ssm get-parameter --region us-east-1 --name /prod/api/env --with-decryption --output text --query Parameter.Value" ]
     [ "$(<"$parameter_file")" = $'KEY=value\nOTHER=2' ]
+    [ "$(tail -c 1 "$parameter_file")" = "2" ]
 }
 
 @test "pull_ssm_parameter overwrites an existing parameter file" {

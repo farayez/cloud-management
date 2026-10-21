@@ -118,7 +118,6 @@ docker push 123.dkr.ecr.us-east-1.amazonaws.com/api:login.latest"
 }
 
 @test "push_image fails when the docker push fails" {
-    skip "Known bug: docker-push result is not checked in push_image.sh"
     mock_response "docker push" 1
     run_repo_script push_image config=test.config.json resource=api
     [ "$status" -eq 1 ]

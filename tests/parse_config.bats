@@ -15,9 +15,9 @@ setup() {
     [ "$output" = $'a=1\nb=two' ]
 }
 
-@test "fn_get_variable_export_strings_from_json wraps values containing spaces in quotes" {
-    run fn_get_variable_export_strings_from_json '{"config":{"cmd":"echo hi"}}'
-    [ "$output" = 'cmd="echo hi"' ]
+@test "fn_get_variable_export_strings_from_json does not wrap values containing spaces in quotes" {
+    run fn_get_variable_export_strings_from_json '{"config":{"cmd":"echo  hi"}}'
+    [ "$output" = 'cmd=echo  hi' ]
 }
 
 @test "fn_get_variable_export_strings_from_json skips null and empty object values" {
@@ -35,7 +35,7 @@ setup() {
 @test "fn_populate_config_variables_from_json exports every config value" {
     fn_populate_config_variables_from_json '{"config":{"alpha":"a","beta":"b c"}}'
     [ "$alpha" = "a" ]
-    [ "$beta" = '"b c"' ]
+    [ "$beta" = 'b c' ]
     [[ "$(export -p)" == *"declare -x alpha=\"a\""* ]]
 }
 
@@ -59,7 +59,7 @@ setup() {
     [ "$aws_region" = "us-east-1" ]
     [ "$host" = "10.0.0.1" ]
     [ "$username" = "ubuntu" ]
-    [ "$description" = '"main web server"' ]
+    [ "$description" = 'main web server' ]
     [ "$port" = "22" ]
     [ "$enabled" = "true" ]
     [ "$paths" = '["/*"]' ]
@@ -114,7 +114,7 @@ setup() {
     fn_populate_config_variables
 
     [ "$host" = "10.0.0.1" ]
-    [ "$command1" = '"echo hi"' ]
+    [ "$command1" = 'echo hi' ]
     [ "$command2" = "ls" ]
     [ ! -v name ]
 }

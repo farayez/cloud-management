@@ -104,6 +104,19 @@ EOF
     [ "$status" -eq 1 ]
 }
 
+@test "redeploy_service keeps the current task definition when none is configured" {
+    run_repo_script redeploy_service config=test.config.json resource=locked
+    [ "$status" -eq 0 ]
+    [ "$(mock_calls)" = "aws ecs update-service --cluster main-cluster --service locked-service --region us-east-1 --enable-execute-command --force-new-deployment" ]
+}
+
+@test "redeploy_service fails when the latest task definition cannot be retrieved" {
+    mock_response "aws ecs describe-task-definition" 255
+    run_repo_script redeploy_service config=test.config.json resource=codedeploy-api
+    [ "$status" -eq 1 ]
+    [[ "$(mock_calls)" != *"create-deployment"* ]]
+}
+
 @test "redeploy_service fails when required CodeDeploy config is missing" {
     run_repo_script redeploy_service config=test.config.json resource=codedeploy-invalid
     [ "$status" -eq 1 ]
@@ -133,6 +146,13 @@ EOF
     run_repo_script start_service config=test.config.json resource=api
     [ "$status" -eq 1 ]
     [[ "$(plain_output)" != *"SUCCESS"* ]]
+}
+
+@test "start_service fails when required config is missing" {
+    run_repo_script start_service config=test.config.json resource=invalid
+    [ "$status" -eq 1 ]
+    [[ "$(plain_output)" == *"ERROR: ecs_service must be set"* ]]
+    [ -z "$(mock_calls)" ]
 }
 
 # stop_service
