@@ -83,7 +83,7 @@ Resources:
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckIntervalSeconds: 10
+      HealthCheckIntervalSeconds: 30
       HealthCheckPath: !Ref HealthCheckPath
       HealthCheckPort: "traffic-port"
       HealthCheckProtocol: HTTP
@@ -195,6 +195,7 @@ Resources:
       Tags: []
       PropagateTags: TASK_DEFINITION
       EnableECSManagedTags: true
+      HealthCheckGracePeriodSeconds: 120
     DependsOn:
       - Listener
 
