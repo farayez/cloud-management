@@ -7,6 +7,7 @@ Bash scripts to deploy, configure, and manage AWS resources from a single JSON c
 ## Requirements
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), `jq`, `git`, Docker (for images)
+- [`yq`](https://github.com/mikefarah/yq) v4 (only needed for YAML configuration files)
 - VS Code extensions (optional, for tasks): [Command Variable](https://marketplace.visualstudio.com/items?itemName=rioj7.command-variable), [Action Buttons](https://marketplace.visualstudio.com/items?itemName=seunlanlege.action-buttons)
 
 ## Setup
@@ -19,7 +20,7 @@ Bash scripts to deploy, configure, and manage AWS resources from a single JSON c
 
 ## Configuration
 
-Each file in `configurations/` holds shared settings under `config` and lists of named resources per type:
+Each file in `configurations/` holds shared settings under `config` and lists of named resources per type. Files can be JSON (`<name>.config.json`) or YAML (`<name>.config.yaml` / `.yml`). If more than one format exists for the same name, YAML is preferred over JSON.
 
 ```json
 {
@@ -40,7 +41,21 @@ Each file in `configurations/` holds shared settings under `config` and lists of
 }
 ```
 
-Resource-level `config` overrides the shared `config`. See [templates/config_templates.json](templates/config_templates.json) for all resource types and fields (`{}` marks an optional field).
+The same configuration in YAML:
+
+```yaml
+config:
+  aws_profile: my-profile
+  aws_region: us-east-1
+  config_name: my-config
+service:
+  - name: my-api
+    config:
+      ecs_cluster: ...
+      ecs_service: ...
+```
+
+Resource-level `config` overrides the shared `config`, and for `server` items (`item=`), the item's fields override both. Array values such as `branch_options` and `paths` can be written as JSON/YAML arrays. See [templates/config_templates.json](templates/config_templates.json) for all resource types and fields (`{}` marks an optional field).
 
 ## Usage
 
@@ -48,7 +63,7 @@ Resource-level `config` overrides the shared `config`. See [templates/config_tem
 npm run <command> config=<config-file> resource=<resource-name> [item=<item-name>] [key=value ...]
 ```
 
-- `config` defaults to `default.config.json`.
+- `config` defaults to `default.config.json`. Only the trailing `.json`/`.yaml`/`.yml` is ignored when resolving the file, so `config=my-config.config.yaml` and `config=my-config.config` both resolve to `configurations/my-config.config.{yaml,yml,json}`.
 - Any config variable can be overridden with `key=value`.
 - All commands are also available as VS Code tasks with pickers.
 
@@ -85,7 +100,7 @@ npm run <command> config=<config-file> resource=<resource-name> [item=<item-name
 
 ## History
 
-Commands and their output are logged to `history/<config-name>/<resource-type>/<resource-name>/`. This directory is safe to delete.
+Commands and their output are logged to `history/<config-name>/<resource-type>/<resource-name>/`, where `<config-name>` is `config_name` from the configuration (falling back to the file name without `.config.*`). This directory is safe to delete. Each run also prints its start and end time.
 
 ## Tests
 
