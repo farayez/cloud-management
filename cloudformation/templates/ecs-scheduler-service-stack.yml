@@ -25,6 +25,16 @@ Parameters:
       - ENABLED
       - DISABLED
     Default: DISABLED
+  RDSSecurityGroupId:
+    Type: String
+    Default: ""
+    Description: "Optional RDS Security Group ID. If provided, an ingress rule will be created to allow MySQL access from ECS tasks."
+  RDSIngressPort:
+    Type: Number
+    Default: 3306
+    MinValue: 1
+    MaxValue: 65535
+    Description: "Port for RDS ingress rule. Default is 3306 for MySQL."
   TagDomain:
     Type: String
   TagClass:
@@ -38,6 +48,8 @@ Parameters:
     AllowedValues:
       - production
       - staging
+Conditions:
+  HasRDSSecurityGroup: !Not [!Equals [!Ref RDSSecurityGroupId, ""]]
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -58,6 +70,17 @@ Resources:
         - Key: Name
           Value: !Sub ${ECSServiceName}-task-sg
       VpcId: !Ref VpcId
+
+  RDSIngressFromECSTask:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: HasRDSSecurityGroup
+    Properties:
+      GroupId: !Ref RDSSecurityGroupId
+      IpProtocol: tcp
+      FromPort: !Ref RDSIngressPort
+      ToPort: !Ref RDSIngressPort
+      SourceSecurityGroupId: !Ref SecurityGroup
+      Description: !Sub "Allow Database access from ${ECSServiceName} ECS tasks"
 
   ECSService:
     Type: AWS::ECS::Service
