@@ -32,6 +32,7 @@ declare -A script_name_to_resource_tag_map=(
     ["update_cloudformation_stack"]="cloudformation"
     ["list_s3_buckets"]="account"
     ["copy_s3_buckets"]="account"
+    ["delete_s3_buckets"]="account"
     ["ssh_into_server"]="server"
     ["copy_to_server"]="server"
     ["run_command_in_server"]="server"
@@ -41,6 +42,7 @@ declare -A script_name_to_resource_tag_map=(
 declare -A account_level_scripts=(
     ["list_s3_buckets"]=1
     ["copy_s3_buckets"]=1
+    ["delete_s3_buckets"]=1
 )
 
 declare -A script_name_to_sub_resource_array_map=(
@@ -61,6 +63,9 @@ declare -A command_map=(
     ["list-objects-summary"]="aws s3 ls"
     ["s3-head-bucket"]="aws s3api head-bucket,--no-echo"
     ["s3-make-bucket"]="aws s3 mb"
+    ["s3-remove-bucket"]="aws s3 rb"
+    ["s3-list-object-versions"]="aws s3api list-object-versions"
+    ["s3-delete-objects"]="aws s3api delete-objects"
     ["codedeploy-deploy"]="aws deploy create-deployment"
     ["ecs-list-tasks"]="aws ecs list-tasks"
     ["ecs-exec-command"]="aws ecs execute-command,--unbuffered-echo"
