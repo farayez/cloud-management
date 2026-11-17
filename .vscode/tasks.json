@@ -273,6 +273,26 @@
       }
     },
     {
+      "label": "Copy S3 Buckets",
+      "type": "shell",
+      "command": "npm",
+      "problemMatcher": [],
+      "args": [
+        "run",
+        "s3:copy_buckets",
+        "config=${input:configurationFilePicker}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "echo": false,
+        "group": "S3"
+      }
+    },
+    {
       "label": "Invalidate CloudFront Distribution",
       "type": "shell",
       "command": "npm",

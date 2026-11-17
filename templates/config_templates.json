@@ -6,7 +6,14 @@
     "task_definitions_directory": "",
     "ssm_parameters_directory": "",
     "cf_parameter_file_directory": "",
-    "excluded_s3_buckets": {}
+    "excluded_s3_buckets": {},
+    "s3_migration": {
+      "destination_aws_profile": {},
+      "destination_aws_region": {},
+      "s3_buckets_to_copy": {},
+      "destination_bucket_prefix": {},
+      "destination_bucket_postfix": {}
+    }
   },
   "image": {
     "config": {
