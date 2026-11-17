@@ -12,6 +12,7 @@ declare -A resource_tag_to_directory_map=(
     ["cloudfront"]="cloudfront"
     ["cloudformation"]="cloudformation"
     ["server"]="servers"
+    ["account"]="account"
 )
 
 declare -A script_name_to_resource_tag_map=(
@@ -29,9 +30,15 @@ declare -A script_name_to_resource_tag_map=(
     ["invalidate_cloudfront_dist"]="cloudfront"
     ["create_cloudformation_stack"]="cloudformation"
     ["update_cloudformation_stack"]="cloudformation"
+    ["list_s3_buckets"]="account"
     ["ssh_into_server"]="server"
     ["copy_to_server"]="server"
     ["run_command_in_server"]="server"
+)
+
+# Scripts that act on the whole AWS account and take no `resource` argument
+declare -A account_level_scripts=(
+    ["list_s3_buckets"]=1
 )
 
 declare -A script_name_to_sub_resource_array_map=(
@@ -49,6 +56,7 @@ declare -A script_name_to_parameter_map=(
 declare -A command_map=(
     ["update-service"]="aws ecs update-service,--no-echo"
     ["list-buckets"]="aws s3 ls"
+    ["list-objects-summary"]="aws s3 ls"
     ["codedeploy-deploy"]="aws deploy create-deployment"
     ["ecs-list-tasks"]="aws ecs list-tasks"
     ["ecs-exec-command"]="aws ecs execute-command,--unbuffered-echo"

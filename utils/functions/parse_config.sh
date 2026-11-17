@@ -21,6 +21,11 @@ function fn_populate_config_variables() {
     # Populate stack level config variables
     fn_populate_config_variables_from_json "$config_file_content"
 
+    # Account level scripts have no resource, only the stack level config applies
+    if [ -z "$resource_name" ]; then
+        return
+    fi
+
     # Populate resource level config variables
     local resource_content=$(printf '%s' "$config_file_content" | jq -r --arg path "$resource_tag" --arg name "$resource_name" '.[$path][] | select(.name == $name)')
     fn_populate_config_variables_from_json "$resource_content"

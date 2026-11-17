@@ -15,6 +15,7 @@
     "task_definition:register": "./scripts/register_task_definition.sh",
     "s3:sync": "./scripts/sync_with_s3.sh",
     "s3:deploy": "./scripts/deploy_to_s3.sh",
+    "s3:list_buckets": "./scripts/list_s3_buckets.sh",
     "server:ssh": "./scripts/ssh_into_server.sh",
     "server:copy": "./scripts/copy_to_server.sh",
     "server:run_command": "./scripts/run_command_in_server.sh",

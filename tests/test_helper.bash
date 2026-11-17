@@ -52,9 +52,9 @@ setup_script_sandbox() {
 name=$(basename "$0")
 echo "$name $*" >>"$MOCK_DIRECTORY/calls.log"
 
-# Most specific response wins, e.g. "aws ecs list-tasks" before "aws"
-for key in "$name $1 $2" "$name $1" "$name"; do
-    response="$MOCK_DIRECTORY/responses/${key// /_}"
+# Most specific response wins, e.g. "aws s3 ls s3://bucket" before "aws s3 ls" before "aws"
+for key in "$name $1 $2 $3" "$name $1 $2" "$name $1" "$name"; do
+    response="$MOCK_DIRECTORY/responses/${key//[ \/]/_}"
     [ -f "$response.exit" ] || continue
     [ -f "$response.out" ] && cat "$response.out"
     exit "$(<"$response.exit")"
@@ -68,7 +68,7 @@ EOF
 
 # Usage: mock_response "<command> [sub-command...]" <exit_code> [output]
 mock_response() {
-    local file="$MOCK_DIRECTORY/responses/${1// /_}"
+    local file="$MOCK_DIRECTORY/responses/${1//[ \/]/_}"
     echo "$2" >"$file.exit"
     if [ $# -ge 3 ]; then
         printf '%s\n' "$3" >"$file.out"

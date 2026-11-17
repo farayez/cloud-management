@@ -5,7 +5,8 @@
     "config_name": "",
     "task_definitions_directory": "",
     "ssm_parameters_directory": "",
-    "cf_parameter_file_directory": ""
+    "cf_parameter_file_directory": "",
+    "excluded_s3_buckets": {}
   },
   "image": {
     "config": {
